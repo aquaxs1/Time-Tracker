@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>WebsiteTimeTrack – Einstellungen</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="page options">
+<div class="wrap">
+    <h1>WebsiteTimeTrack</h1>
+    <p class="lede">Alle Daten bleiben auf diesem Geraet. Einstellungen werden ueber
+       das Browserprofil abgeglichen, Nutzungsdaten nur auf Wunsch.</p>
+
+    <section>
+        <h2>Messung</h2>
+        <label class="field">
+            <span>Als inaktiv gelten nach</span>
+            <span class="control">
+                <input id="idleSeconds" type="number" min="15" max="900" step="15"> Sekunden
+            </span>
+        </label>
+        <label class="check">
+            <input id="requireInteraction" type="checkbox">
+            <span>Nur zaehlen, wenn ich die Seite wirklich benutze
+                  <small>Maus, Tastatur oder Scrollen – ein bloss geoeffneter Tab zaehlt dann nicht.</small></span>
+        </label>
+        <label class="field indent">
+            <span>Interaktion gilt fuer</span>
+            <span class="control">
+                <input id="interactionTimeoutSeconds" type="number" min="15" max="600" step="15"> Sekunden
+            </span>
+        </label>
+        <label class="check indent">
+            <input id="audibleCountsAsActive" type="checkbox">
+            <span>Tabs mit Ton trotzdem mitzaehlen
+                  <small>Damit ein laufendes Video nicht faelschlich als Pause gilt.</small></span>
+        </label>
+    </section>
+
+    <section>
+        <h2>Erfassung</h2>
+        <label class="check">
+            <input id="trackSubEntities" type="checkbox">
+            <span>Unterobjekte erfassen
+                  <small>YouTube-Kanal, GitHub-Repo, Subreddit, Twitch-Kanal statt nur die Domain.</small></span>
+        </label>
+        <label class="field column">
+            <span>Zusaetzliche Domains mit Bereichs-Erfassung</span>
+            <textarea id="genericSubEntityDomains" rows="2"
+                      placeholder="eine Domain je Zeile – erfasst das erste Pfadsegment"></textarea>
+        </label>
+        <label class="field column">
+            <span>Ignorierliste</span>
+            <textarea id="ignore" rows="4"
+                      placeholder="eine Domain je Zeile, z.B. intern.firma.de oder *.localhost"></textarea>
+            <small>Diese Seiten werden gar nicht erst erfasst. Subdomains sind eingeschlossen.</small>
+        </label>
+    </section>
+
+    <section>
+        <h2>Tageslimits</h2>
+        <p class="hint">Warnung bei <input id="notifyAtPercent" type="number" min="1" max="99" step="5"> %
+           des Limits, Meldung beim Erreichen.</p>
+        <table class="table" id="limitTable">
+            <thead><tr><th>Domain</th><th>Minuten/Tag</th><th>Sperren</th><th></th></tr></thead>
+            <tbody id="limitRows"></tbody>
+        </table>
+        <div class="row-add">
+            <input id="newLimitDomain" type="text" placeholder="youtube.com">
+            <input id="newLimitMinutes" type="number" min="1" max="1440" placeholder="60">
+            <label class="check inline"><input id="newLimitBlock" type="checkbox"><span>sperren</span></label>
+            <button id="addLimit" type="button" class="button">Hinzufuegen</button>
+        </div>
+    </section>
+
+    <section>
+        <h2>Fokusmodus</h2>
+        <label class="check">
+            <input id="focusActive" type="checkbox">
+            <span>Fokusmodus aktiv</span>
+        </label>
+        <label class="field">
+            <span>Automatisch beenden am</span>
+            <span class="control"><input id="focusUntil" type="datetime-local"></span>
+        </label>
+        <label class="field column">
+            <span>Waehrend des Fokusmodus gesperrt</span>
+            <textarea id="focusSites" rows="4" placeholder="eine Domain je Zeile"></textarea>
+            <small>Leer lassen, um alles aus den Kategorien Social und Unterhaltung zu sperren.</small>
+        </label>
+    </section>
+
+    <section>
+        <h2>Kategorien</h2>
+        <p class="hint">Die Zuordnung bestimmt den Produktivitaets-Score. Vorbelegt ist
+           eine Standardliste, hier zaehlt nur, was du selbst aenderst.</p>
+        <div id="categoryRows" class="category-rows"></div>
+        <div class="row-add">
+            <input id="newCategoryDomain" type="text" placeholder="domain.de">
+            <select id="newCategoryValue"></select>
+            <button id="addCategory" type="button" class="button">Zuordnen</button>
+        </div>
+    </section>
+
+    <section>
+        <h2>Wochenreport</h2>
+        <label class="check">
+            <input id="weeklyReport" type="checkbox">
+            <span>Montags eine Zusammenfassung der Vorwoche</span>
+        </label>
+        <div id="reportBox" class="report"></div>
+    </section>
+
+    <section>
+        <h2>Geraete-Abgleich</h2>
+        <label class="check">
+            <input id="syncUsage" type="checkbox">
+            <span>Nutzungsdaten zwischen Geraeten abgleichen
+                  <small>Nutzt den knappen Sync-Speicher des Browsers: nur die letzten Tage,
+                         auf Sekunden gerundet. Einstellungen werden immer abgeglichen.</small></span>
+        </label>
+        <label class="field indent">
+            <span>Abgeglichener Zeitraum</span>
+            <span class="control"><input id="syncDays" type="number" min="1" max="30"> Tage</span>
+        </label>
+        <button id="pushSync" type="button" class="button ghost">Jetzt abgleichen</button>
+        <span id="syncStatus" class="status"></span>
+    </section>
+
+    <section>
+        <h2>Daten</h2>
+        <div class="buttons">
+            <button id="exportCsv" type="button" class="button ghost">CSV exportieren</button>
+            <button id="exportJson" type="button" class="button ghost">JSON-Backup</button>
+            <button id="importJson" type="button" class="button ghost">Backup einlesen</button>
+            <input id="importFile" type="file" accept="application/json,.json" hidden>
+        </div>
+        <label class="check">
+            <input id="importReplace" type="checkbox">
+            <span>Beim Einlesen vorhandene Daten ersetzen statt zusammenfuehren</span>
+        </label>
+        <span id="dataStatus" class="status"></span>
+    </section>
+
+    <p id="saved" class="saved" hidden>Gespeichert</p>
+</div>
+
+<script type="module" src="options.js"></script>
+</body>
+</html>

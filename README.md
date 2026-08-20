@@ -4,132 +4,168 @@ Sammlung eigener Projekte, die bisher nur lokal in OneDrive lagen.
 
 | Projekt | Beschreibung |
 | --- | --- |
-| [`WebsiteTimeTrack/`](WebsiteTimeTrack/) | Chrome-Extension (Manifest V3), die misst, wie lange man auf welcher Website ist |
+| [`WebsiteTimeTrack/`](WebsiteTimeTrack/) | Browser-Extension (Manifest V3, Chrome + Firefox), die misst, wie lange man auf welcher Website ist |
 
 ---
 
 ## WebsiteTimeTrack
 
+Misst lokal die Zeit je Website – mit Tageslimits, Fokusmodus, Kategorien,
+Produktivitaets-Score, Wochenreport und Export. Keine Server, keine externen
+Bibliotheken, keine Netzwerkzugriffe.
+
 ### Installation
 
-1. `chrome://extensions` oeffnen
-2. **Entwicklermodus** aktivieren
-3. **Entpackte Erweiterung laden** → Ordner `WebsiteTimeTrack/` auswaehlen
-
-Tests laufen ohne Abhaengigkeiten:
-
 ```bash
-node WebsiteTimeTrack/test/background.test.mjs
+npm run build     # erzeugt dist/chrome und dist/firefox
 ```
 
-### Funktionsumfang
+* **Chrome:** `chrome://extensions` → Entwicklermodus → *Entpackte Erweiterung laden* → `WebsiteTimeTrack/dist/chrome`
+* **Firefox:** `about:debugging` → *Dieser Firefox* → *Temporaeres Add-on laden* → `WebsiteTimeTrack/dist/firefox/manifest.json`
 
-**Messen**
+Ohne Build laesst sich der Ordner `WebsiteTimeTrack/` in Chrome direkt laden.
 
-- Erfasst pro Domain, wie lange der zugehoerige Tab aktiv im Vordergrund war
-- Zaehlt nur, wenn wirklich gebrowst wird: aktiver Tab **und** fokussiertes
-  Chrome-Fenster **und** der Nutzer nicht idle (60 s Schwelle)
-- Nur `http`/`https`; `chrome://`, `file://` und Extension-Seiten bleiben aussen vor
-- `www.` wird abgeschnitten, `youtube.com` und `www.youtube.com` sind dieselbe Seite
-- Daten liegen in Tages-Buckets, ein Segment ueber Mitternacht wird korrekt
-  auf beide Tage aufgeteilt
-- Standby/Ruhezustand erzeugt keine Fantasie-Zeiten
+```bash
+npm test          # 62 Tests, keine Abhaengigkeiten
+```
 
-**Anzeigen**
+### Was die Extension kann
 
-- Popup mit sortierter Rangliste, Balken relativ zur meistgenutzten Seite
-- Zeitraum umschaltbar: **Heute / 7 Tage / Gesamt**
-- Gesamtsumme des gewaehlten Zeitraums
-- Aktualisiert sich sekuendlich, solange das Popup offen ist
-- Dark Mode ueber `prefers-color-scheme`
-- Zuruecksetzen mit zweistufiger Bestaetigung
+**Messung**
 
-**Technisch**
+| | |
+| --- | --- |
+| Zeit je Domain | Tagesgenau gespeichert, 365 Tage Historie |
+| Echte Aktivitaet | Zaehlt nur bei aktivem Tab, fokussiertem Fenster und nicht-idlem Nutzer |
+| Interaktionspflicht | Optional: nur zaehlen bei Maus, Tastatur oder Scrollen |
+| Ton-Ausnahme | Tabs mit Ton zaehlen trotzdem, damit Videos nicht als Pause gelten |
+| Idle-Korrektur | Die Idle-Schwelle wird rueckwirkend abgezogen, nicht mitgezaehlt |
+| Mitternacht | Segmente ueber 0 Uhr werden auf beide Tage aufgeteilt |
+| Standby-Schutz | Segmente ueber 5 Minuten gelten als Ruhezustand und werden verworfen |
+| Ignorierliste | Domains, die gar nicht erst erfasst werden (inkl. Subdomains) |
 
-- Alles lokal in `chrome.storage.local`, keine Server, keine Netzwerkzugriffe,
-  keine externen Bibliotheken
-- Berechtigungen: `tabs`, `storage`, `idle`, `alarms`
-- Bestehende Daten aus Version 1.0 werden beim Update automatisch migriert
+**Unterobjekte statt nur Domains**
 
-### Was gefixt wurde (1.0 → 1.1.0)
+| | |
+| --- | --- |
+| YouTube | Zeit je Kanal (Kanalname kommt vom Content-Script) |
+| GitHub / GitLab | Zeit je Repository |
+| Reddit | Zeit je Subreddit |
+| Twitch, X | Zeit je Kanal bzw. Profil |
+| Beliebige Domains | Erstes Pfadsegment als Bereich, per Einstellung |
 
-**Kritisch – das Tracking lief so gar nicht zuverlaessig**
+**Auswertung im Popup**
 
-1. **`setInterval` im Service Worker.** MV3 beendet den Service Worker nach
-   kurzer Untaetigkeit, der Sekundentimer stirbt mit. Ersetzt durch
-   ereignisbasierte Segmentmessung plus `chrome.alarms` im Minutentakt.
-2. **Zustand nur im Modul-Scope.** `activeTabId`/`lastActiveTime` waren nach
-   jedem Neustart des Workers weg. Liegt jetzt in `chrome.storage.session`.
-3. **Tracking blieb nach Idle tot.** Beim Wechsel auf `idle` wurde
-   `activeTabId = null` gesetzt, beim Zurueckkommen aber nie wieder gefuellt –
-   ab der ersten Pause zaehlte nichts mehr, bis man den Tab wechselte.
-4. **Nichts wurde gezaehlt bis zum ersten Tabwechsel.** `activeTabId` startete
-   als `null` und wurde nur von `onActivated` gesetzt. Der aktive Tab wird
-   jetzt beim Start des Workers direkt ermittelt.
-5. **Fensterfokus wurde ignoriert.** Minimiertes Chrome oder eine andere App im
-   Vordergrund liefen voll weiter mit. Jetzt haengt `chrome.windows.onFocusChanged`
-   mit drin.
+| | |
+| --- | --- |
+| Zeitraeume | Heute, 7 Tage, 30 Tage, Gesamt |
+| Rangliste | Sortiert, mit Favicon, Balken in Kategoriefarbe |
+| Aufklappen | Klick auf eine Domain zeigt ihre Unterobjekte |
+| Verlauf | Balkendiagramm der letzten 30 Tage |
+| Kategorien | Anteil je Kategorie mit Prozent und Zeit |
+| Produktivitaets-Score | 0–100, gewichtet nach Kategorie |
+| Einzeln loeschen | Domain aus allen Tagen entfernen, zweistufig bestaetigt |
+| Live | Aktualisiert sich sekuendlich, solange das Popup offen ist |
 
-**Popup**
+**Limits, Sperre, Fokus**
 
-6. **Das Diagramm erschien nie.** Chart.js kam per `<script src="https://cdn…">`,
-   was die MV3-CSP (`script-src 'self'`) blockt. Die Balken werden jetzt selbst
-   gerendert – kein CDN, keine Abhaengigkeit.
-7. **Unsortierte Liste** in willkuerlicher Storage-Reihenfolge → absteigend nach Zeit.
-8. **Kein Auto-Refresh**, die Zahlen standen still, solange das Popup offen war.
-9. **Reset loeschte alles sofort und ohne Rueckfrage**, ausserdem via
-   `storage.clear()` auch alles Nicht-Zeitbezogene.
-10. **`formatTime`** gab immer `0h 0m 42s` aus statt `42 s`.
-11. Kein Empty-State, kein `<title>`, kein `charset`, kein `lang`.
+| | |
+| --- | --- |
+| Tageslimit je Domain | In Minuten, Subdomains eingeschlossen |
+| Vorwarnung | Benachrichtigung bei frei waehlbarem Prozentsatz (Standard 80 %) |
+| Sperre | Optional beim Erreichen des Limits, mit eigener Sperrseite |
+| Fokusmodus | Sperrt Ablenkung auf Knopfdruck, mit Ablaufzeit |
+| Fokus-Standard | Ohne eigene Liste greifen die Kategorien Social und Unterhaltung |
+| Snooze | 5 Minuten Ausnahme direkt von der Sperrseite |
 
-**Robustheit & Datenqualitaet**
+**Kategorien und Score**
 
-12. **Abstuerze bei geschlossenen Tabs.** `chrome.tabs.get()` auf einen
-    verschwundenen Tab warf eine unbehandelte Rejection.
-13. **`tab.url.startsWith(...)`** warf `TypeError`, sobald ein Tab keine URL hatte.
-14. **`new URL()` ohne try/catch.**
-15. **Systematische Unterzaehlung.** Pro Sekunde wurde auf ganze Sekunden
-    abgerundet und der Rest verworfen – unter Timer-Drosselung ging so
-    laufend Zeit verloren. Gerechnet wird jetzt in Millisekunden.
-16. **Race Condition beim Schreiben.** `storage.get` + `storage.set` ist nicht
-    atomar; parallele Events konnten sich gegenseitig ueberschreiben. Alle
-    Schreibzugriffe laufen jetzt serialisiert.
-17. **Standby erzeugte Riesenwerte.** Ein zugeklappter Laptop wurde beim
-    Aufwachen als durchgehende Nutzung gebucht. Segmente ueber 5 Minuten
-    werden verworfen.
-18. **Flaches Storage-Schema.** Jede Domain lag als eigener Top-Level-Key neben
-    potenziellen Einstellungen, und das Popup las mit `get(null)` blind alles
-    ein. Jetzt ein sauber getrennter `usage`-Baum mit Versionsfeld.
-19. **`chrome.idle.setDetectionInterval`** wurde nie gesetzt.
+| | |
+| --- | --- |
+| Sieben Kategorien | Arbeit, Lernen, News, Shopping, Social, Unterhaltung, Sonstiges |
+| Vorbelegung | Rund 100 bekannte Domains sind zugeordnet |
+| Eigene Zuordnung | Pro Domain aenderbar, wirkt auch auf Subdomains |
+| Score | 50 ist neutral, Arbeit und Lernen heben ihn, Social und Unterhaltung senken ihn |
 
-**Manifest / Repo**
+**Report, Export, Sync**
 
-20. `alarms`-Permission ergaenzt, `icons`-Block ergaenzt (fehlte komplett),
-    Einrueckung korrigiert, Version auf `1.1.0`.
-21. **`WebsiteTimeTrack.pem` wurde nicht eingecheckt.** Das ist der private
-    Signierschluessel der Extension – wer ihn hat, kann Updates unter deiner
-    Extension-ID veroeffentlichen. `.gitignore` blockt `*.pem` und `*.crx`.
-    Bewahre die Datei ausserhalb des Repos auf.
+| | |
+| --- | --- |
+| Wochenreport | Montags automatisch: Summe, Top-Seiten, Kategorien, Score, Vergleich zur Vorwoche |
+| CSV-Export | Eine Zeile je Tag und Domain, direkt pivotierbar |
+| JSON-Backup | Vollstaendig, inklusive Unterobjekten und Einstellungen |
+| Import | Zusammenfuehren oder ersetzen |
+| Einstellungs-Sync | Ueber das Browserprofil, ohne Zutun |
+| Daten-Sync | Optional, letzte N Tage, je Geraet ein eigener Bereich (konfliktfrei) |
 
-### Ideen fuer als naechstes
+**Technik**
 
-**Naheliegend**
+| | |
+| --- | --- |
+| Speicher | Alles lokal; `storage.local` fuer Daten, `storage.sync` fuer Einstellungen |
+| Berechtigungen | `tabs`, `storage`, `idle`, `alarms`, `notifications`, `favicon` |
+| Aufbewahrung | 365 Tage Domaindaten, 60 Tage Unterobjekte, automatisch bereinigt |
+| Migration | Daten aus 1.0 und 1.1 werden beim Update uebernommen |
+| Firefox | Eigenes Manifest, sonst identischer Code |
+| Tests | 62 Tests ohne Abhaengigkeiten (`npm test`) |
 
-- **Limits pro Seite** mit Benachrichtigung („90 min YouTube erreicht")
-- **Blocklist / Fokusmodus**: gesetzte Seiten nach Ablauf des Limits sperren
-- **Verlauf**: Balken pro Tag der letzten 30 Tage, Wochenvergleich
-- **Kategorien** (Arbeit / Social / Unterhaltung) mit Auswertung pro Gruppe
-- **Favicons** in der Liste, dazu Suchfeld ab vielen Eintraegen
-- **Einzelne Domain loeschen** statt nur „alles zuruecksetzen"
-- **Ignorierliste** fuer Domains, die gar nicht erst erfasst werden
-- **Options-Seite** fuer Idle-Schwelle, Limits, Ignorierliste
+### Aufbau
 
-**Groesser**
+```
+WebsiteTimeTrack/
+  manifest.json           Chrome (MV3, Service Worker)
+  manifest.firefox.json   Firefox (MV3, Event Page)
+  background.js           Segmentmessung, Limits, Sperre, Wartung
+  content.js              Interaktionsmeldung + YouTube-Kanal
+  popup.*                 Rangliste, Verlauf, Kategorien
+  options.*               Einstellungen, Kategorien, Report, Export
+  blocked.*               Sperrseite mit Snooze
+  lib/
+    time.js         Tages- und Wochenschluessel, Formatierung
+    entity.js       Domain- und Unterobjekt-Erkennung, Musterabgleich
+    categories.js   Kategorien, Standardzuordnung, Score
+    settings.js     Defaults, Lesen/Schreiben in storage.sync
+    storage.js      Schema, Aggregation, Migration, Aufbewahrung
+    limits.js       Limits, Benachrichtigungen, Sperrgruende
+    report.js       Wochenreport
+    export.js       CSV, JSON, Import
+    sync.js         Geraeteabgleich
+  test/                   62 Tests
+```
 
-- **Export/Import** als CSV und JSON, dazu automatischer Wochenreport
-- **Sync** ueber `chrome.storage.sync` oder eigenes Backend fuer mehrere Geraete
-- **Tiefer als die Domain**: Zeit pro YouTube-Kanal oder pro GitHub-Repo
-- **Produktivitaets-Score** je Tag aus den Kategorien
-- **Firefox-Port** – die WebExtension-APIs sind zu 95 % identisch
-- **Aktive statt nur offener Zeit**: Scroll-/Tastatur-Events per Content-Script,
-  damit ein offenes Video-Tab nicht als Interaktion zaehlt
+### Versionsgeschichte
+
+**2.0.0** – Limits mit Benachrichtigung, Sperre und Fokusmodus, 30-Tage-Verlauf,
+Kategorien mit Produktivitaets-Score, Favicons, einzelne Domains loeschen,
+Ignorierliste, Optionsseite, CSV/JSON-Export mit Import, Wochenreport,
+Geraeteabgleich, Unterobjekte (YouTube-Kanal, GitHub-Repo, Subreddit),
+Firefox-Port, Interaktionserkennung per Content-Script.
+
+Dabei zusaetzlich korrigiert: Beim Wechsel in den Idle-Zustand wurde die volle
+Zeit bis zum naechsten Alarm gebucht, obwohl Chrome den Zustand erst nach
+Ablauf der Schwelle meldet. Die Schwelle wird jetzt abgezogen; bei aktivierter
+Interaktionspflicht endet ein Segment am Ende des Interaktionsfensters.
+
+**1.1.0** – Fehlerbehebungen an der Erstfassung:
+
+*Kritisch:* `setInterval` im Service Worker (MV3 beendet ihn, der Timer stirbt
+mit) · Zustand nur im Modul-Scope · nach einer Idle-Phase zaehlte nichts mehr ·
+vor dem ersten Tabwechsel zaehlte nichts · Fensterfokus wurde ignoriert ·
+Chart.js vom CDN wurde von der MV3-CSP blockiert, das Diagramm erschien nie.
+
+*Robustheit:* Abstuerze bei geschlossenen Tabs und Tabs ohne URL ·
+systematische Unterzaehlung durch Sekundenrundung · Race Condition beim
+Schreiben · Standby wurde als Nutzung gebucht · flaches Storage-Schema ·
+`setDetectionInterval` nie gesetzt.
+
+*Popup:* unsortiert · kein Auto-Refresh · Reset ohne Rueckfrage · `formatTime`
+gab immer `0h 0m 42s` aus.
+
+**1.0** – Ursprungsfassung aus OneDrive.
+
+### Hinweis zum Signierschluessel
+
+Das urspruengliche Archiv enthielt `WebsiteTimeTrack.pem`, den privaten
+Signierschluessel der Extension. Er ist bewusst nicht eingecheckt – wer ihn
+hat, kann Updates unter derselben Extension-ID veroeffentlichen. `.gitignore`
+blockt `*.pem` und `*.crx`; die Datei gehoert ausserhalb des Repos aufbewahrt.

@@ -3,17 +3,21 @@
   "name": "WebsiteTimeTrack",
   "version": "2.0.0",
   "description": "Misst lokal, wie lange du auf welcher Website bist – mit Limits, Fokusmodus, Kategorien und Wochenreport.",
-  "minimum_chrome_version": "110",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "websitetimetrack@local",
+      "strict_min_version": "121.0"
+    }
+  },
   "permissions": [
     "tabs",
     "storage",
     "idle",
     "alarms",
-    "notifications",
-    "favicon"
+    "notifications"
   ],
   "background": {
-    "service_worker": "background.js",
+    "scripts": ["background.js"],
     "type": "module"
   },
   "action": {

@@ -5,22 +5,44 @@
     <title>Website Time Tracker</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="popup">
     <header>
-        <h1>Website Time Tracker</h1>
-        <div class="ranges" role="tablist">
-            <button type="button" class="range" data-range="today" aria-selected="true">Heute</button>
-            <button type="button" class="range" data-range="week" aria-selected="false">7 Tage</button>
-            <button type="button" class="range" data-range="all" aria-selected="false">Gesamt</button>
+        <div class="titlebar">
+            <h1>Website Time Tracker</h1>
+            <button id="focus" type="button" class="focus-toggle" title="Fokusmodus">Fokus</button>
         </div>
-        <p id="total" class="total"></p>
+
+        <div class="tabs" id="ranges" role="tablist">
+            <button type="button" class="tab" data-range="today" aria-selected="true">Heute</button>
+            <button type="button" class="tab" data-range="week" aria-selected="false">7 Tage</button>
+            <button type="button" class="tab" data-range="month" aria-selected="false">30 Tage</button>
+            <button type="button" class="tab" data-range="all" aria-selected="false">Gesamt</button>
+        </div>
+
+        <div class="summary">
+            <span id="total" class="summary-total"></span>
+            <span id="score" class="score" hidden></span>
+        </div>
+
+        <div class="tabs subtle" id="views" role="tablist">
+            <button type="button" class="tab" data-view="sites" aria-selected="true">Seiten</button>
+            <button type="button" class="tab" data-view="history" aria-selected="false">Verlauf</button>
+            <button type="button" class="tab" data-view="categories" aria-selected="false">Kategorien</button>
+        </div>
     </header>
 
-    <ul id="websiteList" class="sites"></ul>
-    <p id="empty" class="empty" hidden>Noch keine Daten fuer diesen Zeitraum.</p>
+    <main>
+        <ul id="siteList" class="sites"></ul>
+        <div id="history" class="history" hidden></div>
+        <ul id="categoryList" class="categories" hidden></ul>
+        <p id="empty" class="empty" hidden>Noch keine Daten fuer diesen Zeitraum.</p>
+    </main>
 
-    <button id="reset" type="button" class="reset">Zuruecksetzen</button>
+    <footer>
+        <button id="options" type="button" class="link">Einstellungen</button>
+        <button id="reset" type="button" class="link danger">Alles zuruecksetzen</button>
+    </footer>
 
-    <script src="popup.js"></script>
+    <script type="module" src="popup.js"></script>
 </body>
 </html>
