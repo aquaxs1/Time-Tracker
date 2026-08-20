@@ -1,14 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
+    <meta charset="utf-8">
+    <title>Website Time Tracker</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Website Time Tracker</h1>
-    <canvas id="timeChart" width="300" height="200"></canvas>
-    <ul id="websiteList"></ul>
-    <button id="reset">Reset All</button>
+    <header>
+        <h1>Website Time Tracker</h1>
+        <div class="ranges" role="tablist">
+            <button type="button" class="range" data-range="today" aria-selected="true">Heute</button>
+            <button type="button" class="range" data-range="week" aria-selected="false">7 Tage</button>
+            <button type="button" class="range" data-range="all" aria-selected="false">Gesamt</button>
+        </div>
+        <p id="total" class="total"></p>
+    </header>
+
+    <ul id="websiteList" class="sites"></ul>
+    <p id="empty" class="empty" hidden>Noch keine Daten fuer diesen Zeitraum.</p>
+
+    <button id="reset" type="button" class="reset">Zuruecksetzen</button>
+
     <script src="popup.js"></script>
 </body>
 </html>

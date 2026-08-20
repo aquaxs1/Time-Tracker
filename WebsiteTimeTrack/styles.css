@@ -1,40 +1,145 @@
+:root {
+    --bg: #ffffff;
+    --fg: #1c1e21;
+    --muted: #6b7280;
+    --line: #e3e6ea;
+    --bar: rgba(54, 162, 235, 0.22);
+    --accent: #36a2eb;
+    --accent-hover: #2b85c7;
+    --danger: #d9534f;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #1f2226;
+        --fg: #e8eaed;
+        --muted: #9aa0a6;
+        --line: #34383d;
+        --bar: rgba(54, 162, 235, 0.28);
+        --accent: #36a2eb;
+        --accent-hover: #4fb3f0;
+        --danger: #e26b67;
+    }
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    padding: 10px;
-    width: 350px;
+    font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+    font-size: 13px;
+    margin: 0;
+    padding: 12px;
+    width: 340px;
+    background: var(--bg);
+    color: var(--fg);
 }
 
 h1 {
-    font-size: 18px;
-    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 10px;
     text-align: center;
 }
 
-ul {
-    list-style: none;
-    padding-left: 0;
-    max-height: 150px;
-    overflow-y: auto;
-    margin-top: 10px;
-    border-top: 1px solid #ddd;
-    padding-top: 10px;
+.ranges {
+    display: flex;
+    gap: 4px;
+    background: var(--line);
+    border-radius: 6px;
+    padding: 3px;
 }
 
-li {
-    margin: 5px 0;
-}
-
-button {
-    margin-top: 10px;
-    padding: 5px 10px;
+.range {
+    flex: 1;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 0;
+    font: inherit;
+    color: var(--muted);
+    background: transparent;
     cursor: pointer;
+}
+
+.range[aria-selected="true"] {
+    background: var(--bg);
+    color: var(--fg);
+    font-weight: 600;
+}
+
+.total {
+    margin: 8px 0 0;
+    color: var(--muted);
+    text-align: center;
+    min-height: 16px;
+}
+
+.sites {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.site {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* Balken liegt als Hintergrund hinter dem Text – spart eine zweite Spalte. */
+.bar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--bar);
+    border-radius: 4px;
+}
+
+.name,
+.value {
+    position: relative;
+}
+
+.name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.value {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.empty {
+    color: var(--muted);
+    text-align: center;
+    margin: 24px 0;
+}
+
+.reset {
+    margin-top: 12px;
+    padding: 7px 10px;
     width: 100%;
-    background-color: #36a2eb;
-    color: white;
+    font: inherit;
+    color: #fff;
+    background: var(--accent);
     border: none;
     border-radius: 5px;
+    cursor: pointer;
 }
 
-button:hover {
-    background-color: #2b85c7;
+.reset:hover {
+    background: var(--accent-hover);
+}
+
+.reset.armed {
+    background: var(--danger);
 }

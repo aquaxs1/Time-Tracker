@@ -1,23 +1,29 @@
 {
   "manifest_version": 3,
   "name": "WebsiteTimeTrack",
-  "version": "1.0",
+  "version": "1.1.0",
   "description": "Track your website usage time",
+  "minimum_chrome_version": "102",
   "permissions": [
     "tabs",
     "storage",
-    "idle"
+    "idle",
+    "alarms"
   ],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
-  "default_popup": "popup.html",
-  "default_icon": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
     "16": "icon16.png",
     "48": "icon48.png",
     "128": "icon128.png"
   }
-}
-
 }

@@ -1,0 +1,10 @@
+# Signierschluessel der Extension – gehoert NIE ins Repository.
+*.pem
+
+# Build-Artefakte
+*.crx
+*.zip
+
+node_modules/
+.DS_Store
+Thumbs.db
