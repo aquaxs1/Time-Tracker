@@ -1,21 +1,19 @@
 /**
- * Geraete-Abgleich der Nutzungsdaten (optional, Standard aus).
+ * Cross-device sync of usage data (optional, off by default).
  *
- * chrome.storage.sync ist knapp bemessen: ~100 KB gesamt, 8 KB je Eintrag,
- * 512 Eintraege, begrenzte Schreibrate. Deshalb werden nur die letzten Tage
- * abgeglichen, in Sekunden statt Millisekunden, und je Tag und Geraet ein
- * eigener Eintrag geschrieben.
+ * chrome.storage.sync is small: ~100 KB total, 8 KB per item, 512 items,
+ * a limited write rate. So only the most recent days are synced, in seconds
+ * rather than milliseconds, with one item written per day and device.
  *
- * Jedes Geraet schreibt ausschliesslich in seine eigenen Keys. Damit gibt es
- * keine konkurrierenden Schreibzugriffe und keine Konflikte – beim Lesen
- * werden die fremden Geraete einfach dazuaddiert.
+ * Each device writes only to its own keys. That means no competing writes and
+ * no conflicts – on read, the other devices' data is simply added on top.
  */
 
 import { lastDays } from "./time.js";
 import { deviceId, getUsage } from "./storage.js";
 
 const PREFIX = "u_";
-const MAX_ITEM_BYTES = 7000; // 8 KB Limit mit Sicherheitsabstand.
+const MAX_ITEM_BYTES = 7000; // 8 KB limit with a safety margin.
 
 function keyFor(device, day) {
     return `${PREFIX}${device}_${day}`;
@@ -29,7 +27,7 @@ function parseKey(key) {
     return { device: rest.slice(0, split), day: rest.slice(split + 1) };
 }
 
-/** Grosse Tage kuerzen: die kleinsten Domains fliegen raus, bis es passt. */
+/** Trims a large day: the smallest domains drop off until it fits. */
 function trimToLimit(bucket) {
     let entries = Object.entries(bucket).sort((a, b) => b[1] - a[1]);
     while (entries.length > 0) {
@@ -40,7 +38,7 @@ function trimToLimit(bucket) {
     return {};
 }
 
-/** Lokale Daten der letzten `days` Tage in den Sync-Bereich schreiben. */
+/** Writes local data for the last `days` days into the sync area. */
 export async function push(days) {
     const device = await deviceId();
     const usage = await getUsage();
@@ -51,7 +49,7 @@ export async function push(days) {
         const bucket = usage[day];
         if (!bucket) continue;
 
-        // Sekunden reichen fuer den Abgleich und sparen deutlich Platz.
+        // Seconds are precise enough for sync and save noticeable space.
         const compact = {};
         for (const [domain, ms] of Object.entries(bucket)) {
             const seconds = Math.round(ms / 1000);
@@ -60,7 +58,7 @@ export async function push(days) {
         if (Object.keys(compact).length) payload[keyFor(device, day)] = trimToLimit(compact);
     }
 
-    // Eigene Eintraege ausserhalb des Fensters wieder freigeben.
+    // Release this device's own entries that have fallen outside the window.
     const existing = await chrome.storage.sync.get(null);
     const stale = Object.keys(existing).filter((key) => {
         const parsed = parseKey(key);
@@ -72,8 +70,9 @@ export async function push(days) {
 }
 
 /**
- * Daten aller *anderen* Geraete lesen, als { day: { domain: ms } }.
- * Die eigenen Daten kommen aus dem lokalen Speicher – sonst zaehlt alles doppelt.
+ * Reads data from every *other* device, as { day: { domain: ms } }.
+ * This device's own data comes from local storage – otherwise everything
+ * would count twice.
  */
 export async function pullOthers() {
     const device = await deviceId();
@@ -94,7 +93,7 @@ export async function pullOthers() {
     return merged;
 }
 
-/** Lokale und fremde Tages-Buckets zu einer Ansicht verschmelzen. */
+/** Merges local and remote daily buckets into a single view. */
 export function mergeUsage(local, remote) {
     const merged = {};
     for (const source of [local, remote]) {
@@ -109,18 +108,18 @@ export function mergeUsage(local, remote) {
     return merged;
 }
 
-/** Lokale Daten plus – falls eingeschaltet – die der anderen Geraete. */
+/** Local data, plus other devices' data if sync is turned on. */
 export async function usageForDisplay(settings) {
     const local = await getUsage();
     if (!settings || !settings.syncUsage) return local;
     try {
         return mergeUsage(local, await pullOthers());
     } catch {
-        return local; // Sync darf die Anzeige nie blockieren.
+        return local; // Sync must never block the display.
     }
 }
 
-/** Alle eigenen Sync-Eintraege entfernen (beim Abschalten des Abgleichs). */
+/** Removes all of this device's own sync entries (when sync is turned off). */
 export async function clearOwn() {
     const device = await deviceId();
     const all = await chrome.storage.sync.get(null);

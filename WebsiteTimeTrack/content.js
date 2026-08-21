@@ -1,13 +1,12 @@
 /**
- * Content-Script.
+ * Content script.
  *
- * Zwei Aufgaben:
- *   1. Echte Interaktion melden (Maus, Tastatur, Scrollen) – damit ein nur
- *      geoeffneter Tab nicht als Nutzung durchgeht.
- *   2. Auf YouTube-Videoseiten den Kanalnamen nachliefern; in der URL steht er
- *      nicht drin.
+ * Two jobs:
+ *   1. Report real interaction (mouse, keyboard, scroll) – so a merely open
+ *      tab doesn't count as usage.
+ *   2. On YouTube video pages, supply the channel name; it isn't in the URL.
  *
- * Bewusst schlank: gedrosselte Meldungen, passive Listener, kein Framework.
+ * Deliberately lean: throttled messages, passive listeners, no framework.
  */
 
 (() => {
@@ -16,12 +15,12 @@
 
     let lastSent = 0;
 
-    /** Der Service Worker kann gerade schlafen – Fehler sind hier normal. */
+    /** The service worker may be asleep right now – errors here are normal. */
     function send(message) {
         try {
             chrome.runtime.sendMessage(message, () => void chrome.runtime.lastError);
         } catch {
-            // Extension wurde neu geladen oder entladen.
+            // The extension was reloaded or unloaded.
         }
     }
 
@@ -36,12 +35,12 @@
         addEventListener(event, onInteraction, { passive: true, capture: true });
     }
 
-    // Sichtbar werden ist auch eine Form von Zuwendung.
+    // Becoming visible counts as attention too.
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "visible") onInteraction();
     });
 
-    /* ------------------------------------------------------------- YouTube */
+    /* --------------------------------------------------------------- YouTube */
 
     if (location.hostname.endsWith("youtube.com")) {
         const SELECTORS = [
@@ -67,7 +66,7 @@
         let timer = null;
 
         function poll() {
-            // YouTube rendert den Kanalnamen nach; ein paar Versuche reichen.
+            // YouTube renders the channel name in after load; a few retries suffice.
             const label = readChannel();
             if (label && label !== reported) {
                 reported = label;
@@ -85,7 +84,7 @@
         }
 
         restart();
-        // YouTube ist eine Single-Page-App: kein Reload beim Videowechsel.
+        // YouTube is a single-page app: no reload when switching videos.
         addEventListener("yt-navigate-finish", restart);
 
         let lastUrl = location.href;

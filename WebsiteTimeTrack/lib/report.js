@@ -1,10 +1,9 @@
 /**
- * Wochenreport.
+ * Weekly report.
  *
- * Laeuft montags einmal und fasst die vergangene Woche zusammen: Gesamtzeit,
- * Top-Seiten, Kategorien, Produktivitaets-Score und der Vergleich zur Woche
- * davor. Der Report wird gespeichert, die Benachrichtigung ist nur der Hinweis
- * darauf.
+ * Runs once on Monday and summarizes the past week: total time, top sites,
+ * categories, productivity score, and the comparison to the week before. The
+ * report gets saved; the notification is just a pointer to it.
  */
 
 import { DAY_MS, dayKey, formatMinutes, weekKey } from "./time.js";
@@ -12,7 +11,7 @@ import { aggregate, getReports, getUsage, saveReport } from "./storage.js";
 import { productivityScore, scoreLabel, totalsByCategory } from "./categories.js";
 import { notify } from "./limits.js";
 
-/** Die sieben Tagesschluessel der Woche, in der `timestamp` liegt (Mo–So). */
+/** The seven day keys of the week `timestamp` falls in (Mon–Sun). */
 export function weekDays(timestamp) {
     const d = new Date(timestamp);
     d.setHours(12, 0, 0, 0);
@@ -21,7 +20,7 @@ export function weekDays(timestamp) {
     return Array.from({ length: 7 }, (_, i) => dayKey(monday + i * DAY_MS));
 }
 
-/** Baut den Report fuer die Woche, in der `timestamp` liegt. */
+/** Builds the report for the week `timestamp` falls in. */
 export function buildReport(usage, settings, timestamp) {
     const days = weekDays(timestamp);
     const entries = aggregate(usage, days);
@@ -56,7 +55,7 @@ export function buildReport(usage, settings, timestamp) {
     };
 }
 
-/** Kurztext fuer die Benachrichtigung. */
+/** Short text for the notification. */
 export function reportSummary(report) {
     const parts = [`${formatMinutes(report.totalMs)} online`];
 
@@ -64,7 +63,7 @@ export function reportSummary(report) {
         const diff = report.totalMs - report.previousMs;
         const percent = Math.round((diff / report.previousMs) * 100);
         if (Math.abs(percent) >= 1) {
-            parts.push(`${percent > 0 ? "+" : ""}${percent} % zur Vorwoche`);
+            parts.push(`${percent > 0 ? "+" : ""}${percent}% vs. last week`);
         }
     }
     if (report.score !== null) parts.push(`Score ${report.score} (${scoreLabel(report.score)})`);
@@ -74,8 +73,8 @@ export function reportSummary(report) {
 }
 
 /**
- * Erzeugt den Report der Vorwoche, sobald eine neue Woche begonnen hat.
- * Wird stuendlich aufgerufen und tut ausserhalb dieses Falls nichts.
+ * Creates the previous week's report once a new week has started.
+ * Called hourly and does nothing outside of that moment.
  */
 export async function maybeCreateWeeklyReport(settings, now = Date.now()) {
     if (!settings.weeklyReport) return null;
@@ -88,9 +87,9 @@ export async function maybeCreateWeeklyReport(settings, now = Date.now()) {
 
     const usage = await getUsage();
     const report = buildReport(usage, settings, lastWeekTimestamp);
-    if (report.totalMs <= 0) return null; // Leere Wochen sind keine Meldung wert.
+    if (report.totalMs <= 0) return null; // An empty week isn't worth a notification.
 
     await saveReport(report);
-    await notify(`report-${week}`, `Wochenreport ${week}`, reportSummary(report));
+    await notify(`report-${week}`, `Weekly report – week ${week}`, reportSummary(report));
     return report;
 }

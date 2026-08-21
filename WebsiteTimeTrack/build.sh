@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Baut je einen ladbaren Ordner fuer Chrome und Firefox nach dist/.
-# Unterschied ist allein das Manifest – der Code laeuft in beiden Browsern.
+# Builds one loadable folder each for Chrome and Firefox into dist/.
+# The only difference is the manifest – the code runs unchanged in both.
 set -euo pipefail
 
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -30,5 +30,5 @@ for target in chrome firefox; do
 done
 
 echo
-echo "Chrome:  chrome://extensions -> Entwicklermodus -> Entpackte Erweiterung laden -> dist/chrome"
-echo "Firefox: about:debugging -> Dieser Firefox -> Temporaeres Add-on laden -> dist/firefox/manifest.json"
+echo "Chrome:  chrome://extensions -> Developer mode -> Load unpacked -> dist/chrome"
+echo "Firefox: about:debugging -> This Firefox -> Load Temporary Add-on -> dist/firefox/manifest.json"

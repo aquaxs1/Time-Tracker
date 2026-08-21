@@ -1,39 +1,42 @@
 /**
- * Einstellungen liegen in chrome.storage.sync und wandern damit ohne weiteres
- * Zutun auf alle Geraete, an denen dasselbe Browserprofil angemeldet ist.
- * Ohne Anmeldung faellt Chrome auf lokalen Speicher zurueck – die Extension
- * funktioniert dann genauso, nur eben ohne Abgleich.
+ * Settings live in chrome.storage.sync, so they travel to every device signed
+ * into the same browser profile without any extra work. Without sign-in,
+ * Chrome falls back to local storage – the extension works exactly the same,
+ * just without cross-device sync.
  */
 
 export const DEFAULTS = {
-    // Messung
+    // Appearance
+    theme: "auto", // "auto" | "light" | "dark"
+
+    // Measurement
     idleSeconds: 60,
     requireInteraction: false,
     interactionTimeoutSeconds: 90,
     audibleCountsAsActive: true,
 
-    // Erfassung
+    // Capture
     trackSubEntities: true,
     genericSubEntityDomains: [],
     ignore: [],
 
-    // Kategorien
+    // Categories
     categoryOverrides: {},
 
     // Limits: { "youtube.com": { minutes: 60, block: false } }
     limits: {},
     notifyAtPercent: 80,
 
-    // Fokusmodus
+    // Focus mode
     focus: { active: false, until: 0, sites: [] },
 
-    // Report & Sync
+    // Report & sync
     weeklyReport: true,
     syncUsage: false,
     syncDays: 14,
 };
 
-/** Tiefe Zusammenfuehrung mit den Defaults, damit neue Felder nie fehlen. */
+/** Deep-merges stored settings with the defaults so new fields never go missing. */
 function withDefaults(stored = {}) {
     const merged = { ...DEFAULTS, ...stored };
     merged.focus = { ...DEFAULTS.focus, ...(stored.focus || {}) };
@@ -51,7 +54,7 @@ export async function getSettings() {
         const { settings } = await chrome.storage.sync.get("settings");
         return withDefaults(settings);
     } catch {
-        // storage.sync kann in manchen Profilen fehlschlagen (Quota, kein Login).
+        // storage.sync can fail on some profiles (quota, not signed in).
         const { settings } = await chrome.storage.local.get("settings");
         return withDefaults(settings);
     }
@@ -68,7 +71,7 @@ export async function saveSettings(patch) {
     return next;
 }
 
-/** Ist der Fokusmodus gerade wirklich aktiv? (Ablaufzeit mitgeprueft) */
+/** Is focus mode actually active right now? (accounts for its expiry time) */
 export function focusActive(settings, now = Date.now()) {
     const focus = settings.focus || {};
     if (!focus.active) return false;

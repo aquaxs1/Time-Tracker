@@ -1,8 +1,8 @@
-/** Zeit- und Datumshelfer. Alles bewusst in lokaler Zeit, nicht UTC. */
+/** Time and date helpers. Deliberately all in local time, never UTC. */
 
 export const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** Tagesschluessel im Format YYYY-MM-DD. */
+/** Day key in YYYY-MM-DD format. */
 export function dayKey(timestamp) {
     const d = new Date(timestamp);
     const month = String(d.getMonth() + 1).padStart(2, "0");
@@ -10,28 +10,28 @@ export function dayKey(timestamp) {
     return `${d.getFullYear()}-${month}-${day}`;
 }
 
-/** Millisekunden zum Beginn des Tages, zu dem `dayKey` gehoert. */
+/** Milliseconds at the start of the day a `dayKey` refers to. */
 export function dayStart(key) {
     const [y, m, d] = key.split("-").map(Number);
     return new Date(y, m - 1, d).getTime();
 }
 
-/** Die letzten `count` Tagesschluessel, neuester zuerst. */
+/** The last `count` day keys, most recent first. */
 export function lastDays(count, from = Date.now()) {
     const days = [];
     const anchor = new Date(from);
-    anchor.setHours(12, 0, 0, 0); // Mittags rechnen, dann stoert keine Zeitumstellung.
+    anchor.setHours(12, 0, 0, 0); // Anchor at noon so DST changes can't shift a day.
     for (let i = 0; i < count; i++) {
         days.push(dayKey(anchor.getTime() - i * DAY_MS));
     }
     return days;
 }
 
-/** ISO-Wochenschluessel, z.B. 2026-W34. */
+/** ISO week key, e.g. 2026-W34. */
 export function weekKey(timestamp) {
     const d = new Date(timestamp);
     d.setHours(12, 0, 0, 0);
-    // Auf den Donnerstag der Woche schieben – so definiert ISO 8601 das Jahr.
+    // Shift to the week's Thursday – that's how ISO 8601 defines the year.
     d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
     const firstThursday = new Date(d.getFullYear(), 0, 4);
     firstThursday.setHours(12, 0, 0, 0);
@@ -40,7 +40,7 @@ export function weekKey(timestamp) {
     return `${d.getFullYear()}-W${String(week).padStart(2, "0")}`;
 }
 
-/** Zerlegt ein Segment an Mitternacht, damit jeder Tag korrekt gebucht wird. */
+/** Splits a segment at midnight so every day is booked correctly. */
 export function splitByDay(start, end) {
     const parts = [];
     let cursor = start;
@@ -54,7 +54,7 @@ export function splitByDay(start, end) {
     return parts;
 }
 
-/** Kompakte Dauer: groessere Einheiten nur, wenn vorhanden. */
+/** Compact duration: larger units only when present. */
 export function formatDuration(ms) {
     const seconds = Math.max(0, Math.floor(ms / 1000));
     const h = Math.floor(seconds / 3600);
@@ -65,16 +65,16 @@ export function formatDuration(ms) {
     return `${s} s`;
 }
 
-/** Dauer ohne Sekunden – fuer Limits und Reports. */
+/** Duration without seconds – for limits and reports. */
 export function formatMinutes(ms) {
     const minutes = Math.round(ms / 60000);
     if (minutes < 60) return `${minutes} min`;
     return `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
 }
 
-/** Kurzes Tagesetikett fuer Diagramme, z.B. "Mo 18.8." */
+/** Short day label for charts, e.g. "Mon 8/18". */
 export function shortDayLabel(key) {
     const d = new Date(dayStart(key));
-    const weekday = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"][d.getDay()];
-    return `${weekday} ${d.getDate()}.${d.getMonth() + 1}.`;
+    const weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()];
+    return `${weekday} ${d.getMonth() + 1}/${d.getDate()}`;
 }

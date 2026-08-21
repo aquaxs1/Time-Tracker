@@ -13,7 +13,8 @@ Sammlung eigener Projekte, die bisher nur lokal in OneDrive lagen.
 
 Misst lokal die Zeit je Website – mit Tageslimits, Fokusmodus, Kategorien,
 Produktivitaets-Score, Wochenreport und Export. Keine Server, keine externen
-Bibliotheken, keine Netzwerkzugriffe.
+Bibliotheken, keine Netzwerkzugriffe. Oberflaeche komplett auf Englisch,
+mit Hell-/Dunkelmodus.
 
 ### Installation
 
@@ -27,7 +28,7 @@ npm run build     # erzeugt dist/chrome und dist/firefox
 Ohne Build laesst sich der Ordner `WebsiteTimeTrack/` in Chrome direkt laden.
 
 ```bash
-npm test          # 62 Tests, keine Abhaengigkeiten
+npm test          # 65 Tests, keine Abhaengigkeiten
 ```
 
 ### Was die Extension kann
@@ -67,6 +68,7 @@ npm test          # 62 Tests, keine Abhaengigkeiten
 | Produktivitaets-Score | 0–100, gewichtet nach Kategorie |
 | Einzeln loeschen | Domain aus allen Tagen entfernen, zweistufig bestaetigt |
 | Live | Aktualisiert sich sekuendlich, solange das Popup offen ist |
+| Darkmode | Auto/Light/Dark umschaltbar, Toggle im Popup und auf der Optionsseite |
 
 **Limits, Sperre, Fokus**
 
@@ -83,7 +85,7 @@ npm test          # 62 Tests, keine Abhaengigkeiten
 
 | | |
 | --- | --- |
-| Sieben Kategorien | Arbeit, Lernen, News, Shopping, Social, Unterhaltung, Sonstiges |
+| Sieben Kategorien | Work, Learning, News, Shopping, Social, Entertainment, Other |
 | Vorbelegung | Rund 100 bekannte Domains sind zugeordnet |
 | Eigene Zuordnung | Pro Domain aenderbar, wirkt auch auf Subdomains |
 | Score | 50 ist neutral, Arbeit und Lernen heben ihn, Social und Unterhaltung senken ihn |
@@ -108,7 +110,7 @@ npm test          # 62 Tests, keine Abhaengigkeiten
 | Aufbewahrung | 365 Tage Domaindaten, 60 Tage Unterobjekte, automatisch bereinigt |
 | Migration | Daten aus 1.0 und 1.1 werden beim Update uebernommen |
 | Firefox | Eigenes Manifest, sonst identischer Code |
-| Tests | 62 Tests ohne Abhaengigkeiten (`npm test`) |
+| Tests | 65 Tests ohne Abhaengigkeiten (`npm test`) |
 
 ### Aufbau
 
@@ -131,7 +133,7 @@ WebsiteTimeTrack/
     report.js       Wochenreport
     export.js       CSV, JSON, Import
     sync.js         Geraeteabgleich
-  test/                   62 Tests
+  test/                   65 Tests
 ```
 
 ---
@@ -160,14 +162,22 @@ npm run screenshots     # braucht playwright (devDependency)
 ```
 
 Aendert sich die Oberflaeche der Extension, erzeugt derselbe Befehl die
-Bilder neu – die Website kann also nicht veralten.
-
-**Hinweis:** Die Oberflaeche der Extension ist deutsch, die Website englisch.
-Die Screenshots zeigen daher deutsche Beschriftungen.
+Bilder neu – die Website kann also nicht veralten. Die Screenshots werden
+mit erzwungenem Dark Mode aufgenommen (`theme: "dark"` im Stub), unabhaengig
+vom Systemthema der Maschine, die sie erzeugt.
 
 ---
 
 ### Versionsgeschichte
+
+**2.1.0** – Neues Logo (Extension-Icons, Website, Favicon). Komplette
+Oberflaeche auf Englisch uebersetzt (Popup, Optionsseite, Sperrseite,
+Benachrichtigungen, CSV-Export) – vorher war nur die Website englisch, die
+Extension selbst deutsch. Dazu ein echter Darkmode: Umschalter Auto/Light/Dark
+im Popup und auf der Optionsseite, gespeichert in `chrome.storage.sync` und
+zusaetzlich in `localStorage` gecacht, damit die Seite schon vor dem ersten
+Rendern im richtigen Thema startet statt kurz hell aufzublitzen. Die
+Website-Screenshots sind neu im Dark Mode aufgenommen.
 
 **2.0.0** – Limits mit Benachrichtigung, Sperre und Fokusmodus, 30-Tage-Verlauf,
 Kategorien mit Produktivitaets-Score, Favicons, einzelne Domains loeschen,

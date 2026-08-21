@@ -1,7 +1,16 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <script>
+        // Sets the theme before the stylesheet is even parsed, avoiding a
+        // flash of the wrong theme. The real source of truth (chrome.storage)
+        // is applied a moment later by popup.js via lib/theme.js.
+        try {
+            var t = localStorage.getItem("theme");
+            if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+        } catch (e) {}
+    </script>
     <title>Website Time Tracker</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -9,14 +18,17 @@
     <header>
         <div class="titlebar">
             <h1>Website Time Tracker</h1>
-            <button id="focus" type="button" class="focus-toggle" title="Fokusmodus">Fokus</button>
+            <button id="theme" type="button" class="theme-toggle" data-mode="auto" title="Appearance: Auto">
+                <span class="glyph" aria-hidden="true"></span>
+            </button>
+            <button id="focus" type="button" class="pill-toggle" title="Focus mode">Focus</button>
         </div>
 
         <div class="tabs" id="ranges" role="tablist">
-            <button type="button" class="tab" data-range="today" aria-selected="true">Heute</button>
-            <button type="button" class="tab" data-range="week" aria-selected="false">7 Tage</button>
-            <button type="button" class="tab" data-range="month" aria-selected="false">30 Tage</button>
-            <button type="button" class="tab" data-range="all" aria-selected="false">Gesamt</button>
+            <button type="button" class="tab" data-range="today" aria-selected="true">Today</button>
+            <button type="button" class="tab" data-range="week" aria-selected="false">7 days</button>
+            <button type="button" class="tab" data-range="month" aria-selected="false">30 days</button>
+            <button type="button" class="tab" data-range="all" aria-selected="false">All time</button>
         </div>
 
         <div class="summary">
@@ -25,9 +37,9 @@
         </div>
 
         <div class="tabs subtle" id="views" role="tablist">
-            <button type="button" class="tab" data-view="sites" aria-selected="true">Seiten</button>
-            <button type="button" class="tab" data-view="history" aria-selected="false">Verlauf</button>
-            <button type="button" class="tab" data-view="categories" aria-selected="false">Kategorien</button>
+            <button type="button" class="tab" data-view="sites" aria-selected="true">Sites</button>
+            <button type="button" class="tab" data-view="history" aria-selected="false">History</button>
+            <button type="button" class="tab" data-view="categories" aria-selected="false">Categories</button>
         </div>
     </header>
 
@@ -35,12 +47,12 @@
         <ul id="siteList" class="sites"></ul>
         <div id="history" class="history" hidden></div>
         <ul id="categoryList" class="categories" hidden></ul>
-        <p id="empty" class="empty" hidden>Noch keine Daten fuer diesen Zeitraum.</p>
+        <p id="empty" class="empty" hidden>No data yet for this range.</p>
     </main>
 
     <footer>
-        <button id="options" type="button" class="link">Einstellungen</button>
-        <button id="reset" type="button" class="link danger">Alles zuruecksetzen</button>
+        <button id="options" type="button" class="link">Settings</button>
+        <button id="reset" type="button" class="link danger">Reset everything</button>
     </footer>
 
     <script type="module" src="popup.js"></script>

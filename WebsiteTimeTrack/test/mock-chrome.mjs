@@ -1,6 +1,6 @@
 /**
- * Minimaler Nachbau der Chrome-Extension-APIs fuer die Tests.
- * Bildet nur ab, was die Extension tatsaechlich aufruft.
+ * A minimal stand-in for the Chrome extension APIs, for tests.
+ * Covers only what the extension actually calls.
  */
 
 export function makeWorld(overrides = {}) {
@@ -13,7 +13,7 @@ export function makeWorld(overrides = {}) {
         windowFocused: true,
         tabs: [{ id: 1, url: "https://example.com/", active: true, windowId: 1, audible: false }],
         notifications: [],
-        updated: [], // { tabId, url } – hier landen erzwungene Umleitungen
+        updated: [], // { tabId, url } – forced redirects land here
         openedOptions: 0,
         ...overrides,
     };
@@ -30,7 +30,7 @@ function storageArea(getStore) {
             return out;
         },
         async set(obj) {
-            // Struktur klonen, damit Tests nicht versehentlich Referenzen teilen.
+            // Deep-clone so tests never accidentally share references.
             Object.assign(getStore(), JSON.parse(JSON.stringify(obj)));
         },
         async remove(keys) {
@@ -126,7 +126,7 @@ export function makeChrome(world) {
     return chrome;
 }
 
-/** Installiert den Mock global und gibt ihn zurueck. */
+/** Installs the mock globally and returns it. */
 export function install(world) {
     const chrome = makeChrome(world);
     globalThis.chrome = chrome;
@@ -134,20 +134,20 @@ export function install(world) {
 }
 
 /**
- * Feuert ein Ereignis und laesst danach die interne Schreibkette auslaufen.
- * Chrome-Listener geben kein Promise zurueck, `await` allein wuerde nicht warten.
+ * Fires an event and then lets the internal write chain drain.
+ * Chrome listeners don't return a promise, so a bare `await` wouldn't wait.
  */
 export async function fire(chrome, name, ...args) {
     for (const listener of chrome._listeners[name] || []) listener(...args);
     await settleQueue();
 }
 
-/** Wartet, bis alle angestossenen Promises durchgelaufen sind. */
+/** Waits until every triggered promise has run its course. */
 export async function settleQueue(rounds = 12) {
     for (let i = 0; i < rounds; i++) await new Promise((resolve) => setTimeout(resolve, 5));
 }
 
-/** Ruft einen Message-Handler auf und liefert dessen Antwort. */
+/** Calls a message handler and returns its reply. */
 export function sendMessage(chrome, message, sender = {}) {
     return new Promise((resolve) => {
         for (const listener of chrome._listeners.message || []) {
@@ -158,7 +158,7 @@ export function sendMessage(chrome, message, sender = {}) {
     });
 }
 
-/** Summe einer Domain ueber alle Tage. */
+/** Total for a domain across all days. */
 export function totalFor(local, domain) {
     return Object.values(local.usage || {}).reduce(
         (sum, bucket) => sum + (bucket[domain] || 0),

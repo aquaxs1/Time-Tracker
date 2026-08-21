@@ -1,26 +1,26 @@
 /**
- * Kategorien und Produktivitaets-Score.
+ * Categories and the productivity score.
  *
- * Die Gewichte sind bewusst grob: der Score soll einen Trend zeigen, keine
- * Wahrheit behaupten. Wer Reddit beruflich liest, verschiebt die Domain auf
- * der Optionsseite in eine andere Kategorie.
+ * The weights are deliberately rough: the score is meant to show a trend, not
+ * claim a truth. If you read Reddit for work, move the domain to a different
+ * category on the options page.
  */
 
 import { matchesPattern } from "./entity.js";
 
 export const CATEGORIES = {
-    work: { label: "Arbeit", weight: 1, color: "#3fa96b" },
-    learning: { label: "Lernen", weight: 1, color: "#4b9fe1" },
+    work: { label: "Work", weight: 1, color: "#3fa96b" },
+    learning: { label: "Learning", weight: 1, color: "#4b9fe1" },
     news: { label: "News", weight: 0.2, color: "#c9a227" },
     shopping: { label: "Shopping", weight: -0.3, color: "#c97fb5" },
     social: { label: "Social", weight: -0.7, color: "#e08a3c" },
-    entertainment: { label: "Unterhaltung", weight: -1, color: "#d9534f" },
-    other: { label: "Sonstiges", weight: 0, color: "#8b93a1" },
+    entertainment: { label: "Entertainment", weight: -1, color: "#d9534f" },
+    other: { label: "Other", weight: 0, color: "#8b93a1" },
 };
 
 export const CATEGORY_KEYS = Object.keys(CATEGORIES);
 
-/** Startzuordnung. Nutzer-Overrides aus den Einstellungen stechen sie aus. */
+/** Starting assignment. User overrides from settings take priority. */
 export const DEFAULT_MAP = {
     work: [
         "github.com", "gitlab.com", "stackoverflow.com", "stackexchange.com",
@@ -62,20 +62,20 @@ export const DEFAULT_MAP = {
     ],
 };
 
-// Domain -> Kategorie, einmal aufgebaut statt bei jedem Aufruf.
+// Domain -> category, built once instead of on every call.
 const LOOKUP = new Map();
 for (const [category, domains] of Object.entries(DEFAULT_MAP)) {
     for (const domain of domains) LOOKUP.set(domain, category);
 }
 
-/** Kategorie einer Domain: erst Nutzer-Override, dann Standardliste. */
+/** Category of a domain: user override first, then the default list. */
 export function categoryOf(domain, overrides = {}) {
     if (!domain) return "other";
 
     const override = overrides[domain];
     if (override && CATEGORIES[override]) return override;
 
-    // Overrides duerfen auch Subdomains abdecken ("example.com" -> "a.example.com").
+    // Overrides may also cover subdomains ("example.com" -> "a.example.com").
     for (const [pattern, category] of Object.entries(overrides)) {
         if (CATEGORIES[category] && matchesPattern(domain, pattern)) return category;
     }
@@ -83,14 +83,14 @@ export function categoryOf(domain, overrides = {}) {
     const direct = LOOKUP.get(domain);
     if (direct) return direct;
 
-    // Subdomains auf die Standardliste zurueckfuehren (z.B. "de.wikipedia.org").
+    // Trace subdomains back to the default list (e.g. "de.wikipedia.org").
     for (const [known, category] of LOOKUP) {
         if (matchesPattern(domain, known)) return category;
     }
     return "other";
 }
 
-/** Summiert [domain, ms] zu Millisekunden je Kategorie. */
+/** Sums [domain, ms] into milliseconds per category. */
 export function totalsByCategory(entries, overrides = {}) {
     const totals = Object.fromEntries(CATEGORY_KEYS.map((key) => [key, 0]));
     for (const [domain, ms] of entries) {
@@ -100,8 +100,8 @@ export function totalsByCategory(entries, overrides = {}) {
 }
 
 /**
- * Produktivitaets-Score 0–100. 50 ist neutral, darueber ueberwiegen Arbeit und
- * Lernen, darunter Social und Unterhaltung. Ohne Daten gibt es keinen Score.
+ * Productivity score, 0–100. 50 is neutral; above it work and learning
+ * dominate, below it social and entertainment do. No score without data.
  */
 export function productivityScore(categoryTotals) {
     let total = 0;
@@ -115,12 +115,12 @@ export function productivityScore(categoryTotals) {
     return Math.round(Math.min(100, Math.max(0, 50 + (weighted / total) * 50)));
 }
 
-/** Einordnung des Scores in Worte. */
+/** Puts the score into words. */
 export function scoreLabel(score) {
     if (score === null) return "";
-    if (score >= 75) return "sehr produktiv";
-    if (score >= 60) return "produktiv";
-    if (score >= 40) return "gemischt";
-    if (score >= 25) return "viel Ablenkung";
-    return "kaum Fokus";
+    if (score >= 75) return "very productive";
+    if (score >= 60) return "productive";
+    if (score >= 40) return "mixed";
+    if (score >= 25) return "lots of distraction";
+    return "little focus";
 }

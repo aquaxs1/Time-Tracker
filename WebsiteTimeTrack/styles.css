@@ -1,4 +1,14 @@
-/* Gemeinsame Basis fuer Popup, Optionsseite und Sperrseite. */
+/* Shared base for the popup, options page and block page. */
+
+/*
+ * Theme: three states driven by the `data-theme` attribute on <html>.
+ *   - no attribute        -> follow the OS (prefers-color-scheme)
+ *   - data-theme="light"  -> force light, regardless of the OS
+ *   - data-theme="dark"   -> force dark, regardless of the OS
+ * The attribute is set by lib/theme.js from the "theme" setting. See the
+ * inline script at the top of each page's <head> for how the very first
+ * paint avoids a flash of the wrong theme.
+ */
 
 :root {
     --bg: #ffffff;
@@ -13,17 +23,29 @@
 }
 
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
         --bg: #1f2226;
         --panel: #262a2f;
         --fg: #e8eaed;
         --muted: #9aa0a6;
         --line: #34383d;
-        --accent: #36a2eb;
-        --accent-hover: #4fb3f0;
+        --accent: #4fa8f5;
+        --accent-hover: #6fbaff;
         --danger: #e26b67;
         --ok: #4cbb7f;
     }
+}
+
+:root[data-theme="dark"] {
+    --bg: #1f2226;
+    --panel: #262a2f;
+    --fg: #e8eaed;
+    --muted: #9aa0a6;
+    --line: #34383d;
+    --accent: #4fa8f5;
+    --accent-hover: #6fbaff;
+    --danger: #e26b67;
+    --ok: #4cbb7f;
 }
 
 * { box-sizing: border-box; }
@@ -42,15 +64,15 @@ h3 { font-size: 13px; font-weight: 600; margin: 0 0 4px; }
 small { color: var(--muted); display: block; font-weight: 400; }
 .muted { color: var(--muted); }
 
-/* ------------------------------------------------------------------ Popup */
+/* ------------------------------------------------------------------- Popup */
 
 .popup { width: 360px; padding: 12px; }
 .popup header { border-bottom: 1px solid var(--line); padding-bottom: 10px; }
 
-.titlebar { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.titlebar { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
 .titlebar h1 { flex: 1; }
 
-.focus-toggle {
+.pill-toggle {
     border: 1px solid var(--line);
     background: transparent;
     color: var(--muted);
@@ -59,7 +81,38 @@ small { color: var(--muted); display: block; font-weight: 400; }
     font: inherit;
     cursor: pointer;
 }
-.focus-toggle.on { background: var(--ok); border-color: var(--ok); color: #fff; }
+.pill-toggle.on { background: var(--ok); border-color: var(--ok); color: #fff; }
+
+/* Theme button: a small sun/moon/circle drawn in CSS, no emoji or icon font. */
+.theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border: 1px solid var(--line);
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+}
+.theme-toggle .glyph {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--muted);
+}
+.theme-toggle[data-mode="light"] .glyph {
+    border-color: #d9a03a;
+    background: #f4c860;
+}
+.theme-toggle[data-mode="dark"] .glyph {
+    border-color: var(--muted);
+    background: transparent;
+    box-shadow: 3px -3px 0 -1px var(--muted) inset;
+}
+.theme-toggle[data-mode="auto"] .glyph {
+    background: linear-gradient(90deg, var(--muted) 50%, transparent 50%);
+}
 
 .tabs {
     display: flex;
@@ -120,7 +173,7 @@ small { color: var(--muted); display: block; font-weight: 400; }
 .site-row.expandable { cursor: pointer; }
 .site-row:hover, .category:hover { background: var(--panel); }
 
-/* Balken liegt als Hintergrund hinter dem Text – spart eine zweite Spalte. */
+/* The bar sits as a background behind the text – saves a second column. */
 .bar { position: absolute; inset: 0 auto 0 0; background: rgba(54, 162, 235, 0.22); border-radius: 4px; }
 
 .favicon {
@@ -166,7 +219,7 @@ small { color: var(--muted); display: block; font-weight: 400; }
     padding-left: 8px;
 }
 
-/* Verlauf */
+/* History */
 .history { margin-top: 10px; }
 .chart {
     display: flex;
@@ -207,7 +260,7 @@ small { color: var(--muted); display: block; font-weight: 400; }
 .link.danger { color: var(--muted); }
 .link.danger:hover { color: var(--danger); }
 
-/* ------------------------------------------------------- Options & Sperre */
+/* -------------------------------------------------------- Options & block */
 
 .page { padding: 24px 16px 48px; }
 .wrap { max-width: 680px; margin: 0 auto; }
@@ -241,6 +294,9 @@ input[type="text"], input[type="number"], input[type="datetime-local"], textarea
 }
 input[type="number"] { width: 80px; }
 textarea { resize: vertical; font-family: ui-monospace, "SF Mono", Consolas, monospace; }
+
+.theme-row { display: flex; gap: 4px; max-width: 320px; }
+.theme-row .tab { padding: 7px 0; }
 
 .table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
 .table th {
@@ -296,7 +352,7 @@ textarea { resize: vertical; font-family: ui-monospace, "SF Mono", Consolas, mon
 .report-top { margin: 8px 0; padding-left: 20px; }
 .report-top li { padding: 2px 0; }
 
-/* Sperrseite */
+/* Block page */
 .block-page { display: grid; place-items: center; min-height: 100vh; }
 .block-card {
     background: var(--panel);

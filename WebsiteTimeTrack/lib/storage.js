@@ -1,17 +1,16 @@
 /**
- * Datenhaltung.
+ * Data storage.
  *
  * chrome.storage.local:
- *   usage   { "YYYY-MM-DD": { "domain.com": ms } }        Tagessummen je Domain
- *   detail  { "YYYY-MM-DD": { "domain.com": { label: ms } } }  Unterobjekte
- *   meta    { schema, deviceId }
- *   notified{ "YYYY-MM-DD": { "domain.com": prozentstufe } }
- *   reports [ Wochenreport, ... ]
- *   snooze  { "domain.com": timestamp }
+ *   usage    { "YYYY-MM-DD": { "domain.com": ms } }             daily totals per domain
+ *   detail   { "YYYY-MM-DD": { "domain.com": { label: ms } } }  sub-entities
+ *   meta     { schema, deviceId }
+ *   notified { "YYYY-MM-DD": { "domain.com": percentLevel } }
+ *   reports  [ weeklyReport, ... ]
+ *   snooze   { "domain.com": timestamp }
  *
- * Alle Schreibzugriffe laufen ueber serialize(): storage.get + storage.set ist
- * nicht atomar, und ohne Kette koennen sich parallele Ereignisse gegenseitig
- * ueberschreiben.
+ * All writes go through serialize(): storage.get + storage.set isn't atomic,
+ * and without a chain, concurrent events could overwrite each other.
  */
 
 import { dayKey, splitByDay, lastDays } from "./time.js";
@@ -22,7 +21,7 @@ const USAGE_RETENTION_DAYS = 365;
 const DETAIL_RETENTION_DAYS = 60;
 const MAX_REPORTS = 8;
 
-/* ------------------------------------------------------------ Schreibkette */
+/* --------------------------------------------------------------- Write chain */
 
 let writeChain = Promise.resolve();
 
@@ -32,7 +31,7 @@ export function serialize(task) {
     return run;
 }
 
-/* -------------------------------------------------------------------- Lesen */
+/* ---------------------------------------------------------------------- Read */
 
 export async function getUsage() {
     const { usage } = await chrome.storage.local.get("usage");
@@ -45,8 +44,8 @@ export async function getDetail() {
 }
 
 /**
- * Summiert Tages-Buckets zu einer sortierten Liste [domain, ms].
- * `days` = null bedeutet: alle Tage.
+ * Sums daily buckets into a sorted list of [domain, ms].
+ * `days` = null means: every day.
  */
 export function aggregate(usage, days = null) {
     const filter = days ? new Set(days) : null;
@@ -63,7 +62,7 @@ export function aggregate(usage, days = null) {
     return Array.from(totals.entries()).sort((a, b) => b[1] - a[1]);
 }
 
-/** Tagessumme ueber alle Domains, als { day: ms }. */
+/** Daily total across all domains, as { day: ms }. */
 export function dailyTotals(usage, days) {
     const result = {};
     for (const day of days) {
@@ -76,13 +75,13 @@ export function dailyTotals(usage, days) {
     return result;
 }
 
-/** Heutige Zeit einer einzelnen Domain – Grundlage fuer die Limitpruefung. */
+/** Today's time for a single domain – the basis for limit checks. */
 export async function todayTotal(domain) {
     const usage = await getUsage();
     return (usage[dayKey(Date.now())] || {})[domain] || 0;
 }
 
-/** Unterobjekte einer Domain im Zeitraum, sortiert. */
+/** Sub-entities of a domain within a range, sorted. */
 export function aggregateDetail(detail, domain, days = null) {
     const filter = days ? new Set(days) : null;
     const totals = new Map();
@@ -99,9 +98,9 @@ export function aggregateDetail(detail, domain, days = null) {
     return Array.from(totals.entries()).sort((a, b) => b[1] - a[1]);
 }
 
-/* ----------------------------------------------------------------- Schreiben */
+/* --------------------------------------------------------------------- Write */
 
-/** Bucht ein Segment auf Domain und optional auf ein Unterobjekt. */
+/** Books a segment onto a domain and, optionally, a sub-entity. */
 export async function addTime(domain, entityLabel, start, end) {
     const { usage = {}, detail = {} } = await chrome.storage.local.get(["usage", "detail"]);
 
@@ -120,7 +119,7 @@ export async function addTime(domain, entityLabel, start, end) {
     await chrome.storage.local.set({ usage, detail });
 }
 
-/** Loescht eine einzelne Domain aus allen Tagen. */
+/** Deletes a single domain from every day. */
 export async function clearDomain(domain) {
     const { usage = {}, detail = {} } = await chrome.storage.local.get(["usage", "detail"]);
     for (const bucket of Object.values(usage)) delete bucket[domain];
@@ -132,9 +131,9 @@ export async function clearAll() {
     await chrome.storage.local.set({ usage: {}, detail: {}, notified: {} });
 }
 
-/* ------------------------------------------------------------- Aufraeumen */
+/* ------------------------------------------------------------------- Pruning */
 
-/** Wirft alte Tage weg, damit der Speicher nicht unbegrenzt waechst. */
+/** Drops old days so storage doesn't grow without bound. */
 export async function prune(now = Date.now()) {
     const { usage = {}, detail = {}, notified = {} } = await chrome.storage.local.get([
         "usage", "detail", "notified",
@@ -157,7 +156,7 @@ export async function prune(now = Date.now()) {
     if (changed) await chrome.storage.local.set({ usage, detail, notified });
 }
 
-/* --------------------------------------------------------------- Reports */
+/* ------------------------------------------------------------------- Reports */
 
 export async function saveReport(report) {
     const { reports = [] } = await chrome.storage.local.get("reports");
@@ -171,9 +170,9 @@ export async function getReports() {
     return Array.isArray(reports) ? reports : [];
 }
 
-/* ------------------------------------------------------- Benachrichtigungen */
+/* -------------------------------------------------------------- Notifications */
 
-/** Merkt sich, bis zu welcher Prozentstufe heute schon gewarnt wurde. */
+/** Remembers which percent level a domain has already been warned at today. */
 export async function notifiedLevel(domain, now = Date.now()) {
     const { notified = {} } = await chrome.storage.local.get("notified");
     return (notified[dayKey(now)] || {})[domain] || 0;
@@ -186,7 +185,7 @@ export async function setNotifiedLevel(domain, level, now = Date.now()) {
     await chrome.storage.local.set({ notified });
 }
 
-/* -------------------------------------------------------------- Snooze */
+/* ------------------------------------------------------------------- Snooze */
 
 export async function getSnooze() {
     const { snooze } = await chrome.storage.local.get("snooze");
@@ -199,9 +198,9 @@ export async function setSnooze(domain, until) {
     await chrome.storage.local.set({ snooze });
 }
 
-/* -------------------------------------------------------------- Geraete-ID */
+/* ---------------------------------------------------------------- Device ID */
 
-/** Stabile, zufaellige ID – nur zum Trennen der Sync-Buckets je Geraet. */
+/** Stable, random ID – used only to separate sync buckets per device. */
 export async function deviceId() {
     const { meta = {} } = await chrome.storage.local.get("meta");
     if (meta.deviceId) return meta.deviceId;
@@ -211,11 +210,11 @@ export async function deviceId() {
     return id;
 }
 
-/* ------------------------------------------------------------- Migration */
+/* ------------------------------------------------------------------ Migration */
 
 /**
- * v1 (flache Keys mit Sekunden) und v2 (usage in Millisekunden) auf v3 heben.
- * v3 ergaenzt nur `detail`, die Zeitdaten selbst bleiben unveraendert.
+ * Lifts v1 (flat keys holding seconds) and v2 (usage in milliseconds) to v3.
+ * v3 only adds `detail` – the time data itself is left unchanged.
  */
 export async function migrate(now = Date.now()) {
     const all = await chrome.storage.local.get(null);
@@ -228,7 +227,7 @@ export async function migrate(now = Date.now()) {
         "usage", "detail", "meta", "notified", "reports", "snooze", "settings",
     ]);
 
-    // v1: jede Domain lag als eigener Top-Level-Key mit Sekunden.
+    // v1: every domain sat as its own top-level key, holding seconds.
     for (const [key, value] of Object.entries(all)) {
         if (known.has(key)) continue;
         if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) continue;

@@ -1,9 +1,9 @@
 /**
  * Popup.
  *
- * Rendert alles selbst per DOM. Eine externe Chart-Bibliothek waere unter der
- * MV3-CSP ohnehin blockiert (script-src 'self') und fuer Balkenlisten nicht
- * noetig.
+ * Renders everything itself via the DOM. An external chart library would be
+ * blocked by the MV3 CSP anyway (script-src 'self') and isn't needed for
+ * bar lists.
  */
 
 import { formatDuration, lastDays, shortDayLabel } from "./lib/time.js";
@@ -13,10 +13,13 @@ import {
 import { CATEGORIES, categoryOf, productivityScore, scoreLabel, totalsByCategory } from "./lib/categories.js";
 import { getSettings, saveSettings, focusActive } from "./lib/settings.js";
 import { usageForDisplay } from "./lib/sync.js";
+import { applyTheme } from "./lib/theme.js";
 
 const REFRESH_MS = 1000;
 const CONFIRM_MS = 4000;
 const FOCUS_DURATION_MINUTES = 60;
+const THEME_ORDER = ["auto", "light", "dark"];
+const THEME_LABEL = { auto: "Auto", light: "Light", dark: "Dark" };
 
 const el = (id) => document.getElementById(id);
 const siteList = el("siteList");
@@ -27,28 +30,28 @@ const emptyEl = el("empty");
 let range = "today";
 let view = "sites";
 let settings = null;
-let expanded = null; // Domain, deren Unterobjekte aufgeklappt sind.
+let expanded = null; // Domain whose sub-entities are expanded.
 let resetArmedUntil = 0;
 
-/* -------------------------------------------------------------------- Daten */
+/* --------------------------------------------------------------------- Data */
 
 function daysFor(current) {
     if (current === "all") return null;
     return lastDays({ today: 1, week: 7, month: 30 }[current] || 1);
 }
 
-/* ------------------------------------------------------------------ Favicon */
+/* ----------------------------------------------------------------- Favicon */
 
 /**
- * Chrome liefert Favicons ueber die `favicon`-Berechtigung aus dem eigenen
- * Cache – ohne Netzwerkzugriff. Wo das fehlschlaegt (Firefox, unbekannte
- * Domain), tritt der Buchstabenkreis an die Stelle.
+ * Chrome serves favicons through the `favicon` permission from its own
+ * cache – no network request. Where that fails (Firefox, an unknown domain),
+ * a letter circle takes its place.
  */
 function faviconNode(domain) {
     const fallback = document.createElement("span");
     fallback.className = "favicon fallback";
     fallback.textContent = domain.charAt(0).toUpperCase();
-    // Aus dem Domainnamen abgeleiteter Farbton – stabil und ohne Zufall.
+    // Hue derived from the domain name – stable, no randomness.
     let hash = 0;
     for (const char of domain) hash = (hash * 31 + char.charCodeAt(0)) % 360;
     fallback.style.background = `hsl(${hash} 45% 45%)`;
@@ -70,7 +73,7 @@ function faviconNode(domain) {
     return img;
 }
 
-/* ------------------------------------------------------------ Seitenansicht */
+/* -------------------------------------------------------------- Sites view */
 
 function renderSites(entries, detail, days) {
     siteList.textContent = "";
@@ -102,7 +105,7 @@ function renderSites(entries, detail, days) {
         const remove = document.createElement("button");
         remove.type = "button";
         remove.className = "remove";
-        remove.title = `${domain} loeschen`;
+        remove.title = `Delete ${domain}`;
         remove.textContent = "×";
         remove.addEventListener("click", (event) => {
             event.stopPropagation();
@@ -142,11 +145,11 @@ function renderSites(entries, detail, days) {
     }
 }
 
-/** Zweistufiges Loeschen – ein Fehlklick soll keine Woche Daten kosten. */
+/** Two-step delete – a stray click shouldn't cost a week of data. */
 function confirmRemove(button, domain) {
     if (button.dataset.armed !== "1") {
         button.dataset.armed = "1";
-        button.textContent = "Sicher?";
+        button.textContent = "Sure?";
         button.classList.add("armed");
         setTimeout(() => {
             button.dataset.armed = "";
@@ -158,7 +161,7 @@ function confirmRemove(button, domain) {
     serialize(() => clearDomain(domain)).then(refresh);
 }
 
-/* ----------------------------------------------------------- Verlaufsansicht */
+/* ------------------------------------------------------------ History view */
 
 function renderHistory(usage) {
     historyBox.textContent = "";
@@ -176,7 +179,7 @@ function renderHistory(usage) {
 
         const fill = document.createElement("div");
         fill.className = "column-fill";
-        // Mindesthoehe, damit auch kurze Tage sichtbar bleiben.
+        // Minimum height so short days stay visible.
         fill.style.height = totals[day] > 0 ? `${Math.max(3, (totals[day] / max) * 100)}%` : "0";
         column.appendChild(fill);
         chart.appendChild(column);
@@ -187,13 +190,13 @@ function renderHistory(usage) {
     scale.append(
         Object.assign(document.createElement("span"), { textContent: shortDayLabel(days[0]) }),
         Object.assign(document.createElement("span"), { textContent: formatDuration(max) + " max" }),
-        Object.assign(document.createElement("span"), { textContent: "heute" }),
+        Object.assign(document.createElement("span"), { textContent: "today" }),
     );
 
     historyBox.append(chart, scale);
 }
 
-/* --------------------------------------------------------- Kategorieansicht */
+/* --------------------------------------------------------- Categories view */
 
 function renderCategories(entries) {
     categoryList.textContent = "";
@@ -220,20 +223,28 @@ function renderCategories(entries) {
 
         const value = document.createElement("span");
         value.className = "value";
-        value.textContent = `${Math.round((ms / sum) * 100)} % · ${formatDuration(ms)}`;
+        value.textContent = `${Math.round((ms / sum) * 100)}% · ${formatDuration(ms)}`;
 
         li.append(bar, name, value);
         categoryList.appendChild(li);
     }
 }
 
-/* ------------------------------------------------------------------ Refresh */
+/* ---------------------------------------------------------------- Refresh */
+
+function setThemeButton(theme) {
+    const btn = el("theme");
+    btn.dataset.mode = theme;
+    btn.title = `Appearance: ${THEME_LABEL[theme]}`;
+}
 
 async function refresh() {
     settings = await getSettings();
+    applyTheme(settings.theme);
+    setThemeButton(settings.theme);
 
-    // Der Service Worker rechnet erst ab, dann lesen wir – sonst fehlt die
-    // laufende Minute.
+    // The service worker flushes first, then we read – or the running minute
+    // would be missing.
     await new Promise((resolve) => {
         try {
             chrome.runtime.sendMessage({ type: "sync" }, () => {
@@ -260,13 +271,13 @@ async function refresh() {
     } else {
         scoreEl.hidden = false;
         scoreEl.textContent = `Score ${score}`;
-        scoreEl.title = `Produktivitaet: ${scoreLabel(score)}`;
+        scoreEl.title = `Productivity: ${scoreLabel(score)}`;
         scoreEl.style.background = `hsl(${Math.round(score * 1.2)} 55% 42%)`;
     }
 
     const active = focusActive(settings);
     el("focus").classList.toggle("on", active);
-    el("focus").textContent = active ? "Fokus an" : "Fokus";
+    el("focus").textContent = active ? "Focus on" : "Focus";
 
     siteList.hidden = view !== "sites";
     historyBox.hidden = view !== "history";
@@ -278,7 +289,7 @@ async function refresh() {
     if (view === "categories") renderCategories(entries);
 }
 
-/* ------------------------------------------------------------------ Bedienung */
+/* --------------------------------------------------------------- Controls */
 
 el("ranges").addEventListener("click", (event) => {
     const button = event.target.closest("[data-range]");
@@ -301,6 +312,13 @@ el("views").addEventListener("click", (event) => {
     refresh();
 });
 
+el("theme").addEventListener("click", async () => {
+    const next = THEME_ORDER[(THEME_ORDER.indexOf(settings.theme) + 1) % THEME_ORDER.length];
+    settings = await saveSettings({ theme: next });
+    applyTheme(next);
+    setThemeButton(next);
+});
+
 el("focus").addEventListener("click", async () => {
     const active = focusActive(settings);
     await saveSettings({
@@ -320,16 +338,16 @@ el("reset").addEventListener("click", async () => {
     const button = el("reset");
     if (Date.now() > resetArmedUntil) {
         resetArmedUntil = Date.now() + CONFIRM_MS;
-        button.textContent = "Wirklich? Nochmal klicken";
+        button.textContent = "Sure? Click again";
         setTimeout(() => {
             if (Date.now() > resetArmedUntil) return;
             resetArmedUntil = 0;
-            button.textContent = "Alles zuruecksetzen";
+            button.textContent = "Reset everything";
         }, CONFIRM_MS);
         return;
     }
     resetArmedUntil = 0;
-    button.textContent = "Alles zuruecksetzen";
+    button.textContent = "Reset everything";
     await serialize(() => clearAll());
     refresh();
 });

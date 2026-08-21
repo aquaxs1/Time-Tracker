@@ -1,15 +1,14 @@
 /**
- * WebsiteTimeTrack – Service Worker
+ * WebsiteTimeTrack – service worker
  *
- * Zeit wird nicht in einem Timer hochgezaehlt, sondern als Segment gemessen:
- * Bei jedem Ereignis, das die aktive Seite aendern kann (Tab-Wechsel, URL-
- * Wechsel, Fenster-Fokus, Idle, Interaktion), wird das laufende Segment
- * abgerechnet und ein neues gestartet. Ein Alarm im Minutentakt weckt den
- * Service Worker und schreibt zwischendurch weg, damit auch lange Sitzungen
- * ueberleben.
+ * Time isn't ticked up by a timer; it's measured as segments: on every event
+ * that can change the active page (tab switch, URL change, window focus,
+ * idle, interaction), the running segment is booked and a new one starts. An
+ * alarm firing once a minute wakes the service worker and flushes in between,
+ * so long sessions survive too.
  *
- * Der gesamte Zustand liegt in chrome.storage.session: MV3 beendet den Service
- * Worker nach kurzer Idle-Zeit, Variablen im Modul-Scope waeren dann weg.
+ * All state lives in chrome.storage.session: MV3 shuts the service worker
+ * down after a short idle period, and module-scope variables would be gone.
  */
 
 import { dayKey } from "./lib/time.js";
@@ -29,14 +28,14 @@ const MAINTENANCE_ALARM = "maintenance";
 const FLUSH_PERIOD_MINUTES = 1;
 const MAINTENANCE_PERIOD_MINUTES = 60;
 
-// Segmente laenger als das hier stammen nicht aus echtem Browsen, sondern aus
-// Standby / Ruhezustand, wo weder Alarm noch Idle-Event feuern. Wird verworfen.
+// Segments longer than this aren't real browsing – they're standby / sleep,
+// where neither the alarm nor an idle event fires. Discarded.
 const MAX_SEGMENT_MS = 5 * 60 * 1000;
 
-/* --------------------------------------------------- Einstellungen (Cache) */
+/* -------------------------------------------------------------- Settings cache */
 
-// Die Einstellungen werden bei jedem Ereignis gebraucht. Der Cache lebt nur so
-// lange wie der Service Worker und wird bei Aenderungen sofort verworfen.
+// Settings are needed on every event. The cache lives only as long as the
+// service worker and is dropped immediately on any change.
 let settingsCache = null;
 
 async function settings() {
@@ -48,7 +47,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
     if ((area === "sync" || area === "local") && changes.settings) settingsCache = null;
 });
 
-/* ------------------------------------------------------------ Sitzungsstatus */
+/* ---------------------------------------------------------------- Session state */
 
 async function sessionState() {
     const state = await chrome.storage.session.get(["active", "lastInteraction", "tabEntity"]);
@@ -59,13 +58,13 @@ async function sessionState() {
     };
 }
 
-/* --------------------------------------------------------------- Erfassung */
+/* --------------------------------------------------------------------- Capture */
 
 /**
- * Was zaehlt gerade – oder null.
- * Bedingungen: Nutzer nicht idle, ein Chrome-Fenster im Vordergrund, eine
- * trackbare URL, nicht auf der Ignorierliste, und – falls verlangt – eine
- * Interaktion in juengerer Vergangenheit.
+ * What's counting right now – or null.
+ * Conditions: the user isn't idle, a Chrome window is in the foreground, the
+ * URL is trackable, it's not on the ignore list, and – if required – there
+ * was an interaction in the recent past.
  */
 async function currentTarget(now) {
     const config = await settings();
@@ -74,7 +73,7 @@ async function currentTarget(now) {
         const idleState = await chrome.idle.queryState(config.idleSeconds);
         if (idleState !== "active") return null;
 
-        // Kein fokussiertes Chrome-Fenster => der Nutzer ist in einer anderen App.
+        // No focused Chrome window => the user is in a different app.
         const win = await chrome.windows.getLastFocused();
         if (!win || !win.focused) return null;
 
@@ -88,7 +87,7 @@ async function currentTarget(now) {
         if (config.requireInteraction) {
             const { lastInteraction } = await sessionState();
             const stale = now - lastInteraction > config.interactionTimeoutSeconds * 1000;
-            // Ein laufendes Video ist Nutzung, auch ohne Maus- oder Tastendruck.
+            // A playing video is usage too, even without a mouse or key press.
             const audible = config.audibleCountsAsActive && tab.audible;
             if (stale && !audible) return null;
         }
@@ -100,12 +99,12 @@ async function currentTarget(now) {
             tabId: tab.id,
         };
     } catch {
-        // Fenster/Tab kann zwischen den Aufrufen verschwinden – dann eben nichts.
+        // A window/tab can disappear between calls – then there's just nothing.
         return null;
     }
 }
 
-/** Unterobjekt aus der URL, fuer YouTube-Videos aus dem Content-Script. */
+/** Sub-entity from the URL, or from the content script for YouTube videos. */
 async function entityFor(tab, config) {
     if (!config.trackSubEntities) return null;
 
@@ -115,27 +114,27 @@ async function entityFor(tab, config) {
     if (needsPageLookup(tab.url)) {
         const { tabEntity } = await sessionState();
         const label = tabEntity[String(tab.id)];
-        if (label) return `Kanal: ${label}`;
+        if (label) return `Channel: ${label}`;
     }
     return null;
 }
 
 /**
- * Bis wann darf das laufende Segment hoechstens gebucht werden?
+ * The latest point in time the running segment may be booked to.
  *
- * Zwei Faelle, in denen "jetzt" zu spaet ist:
- *  - Der Idle-Zustand wird erst nach Ablauf der Schwelle gemeldet. Untaetig war
- *    der Nutzer schon vorher.
- *  - Bei `requireInteraction` endet die Nutzung mit dem Interaktionsfenster,
- *    nicht erst beim naechsten Alarm.
- * Ohne die Kappung wuerde beides der zuletzt besuchten Seite gutgeschrieben.
+ * Two cases where "now" is too late:
+ *  - The idle state is only reported after the threshold has elapsed. The
+ *    user was already inactive before that.
+ *  - With `requireInteraction`, usage ends with the interaction window, not
+ *    only at the next alarm.
+ * Without this cap, both would get credited to the last visited page.
  */
 async function segmentDeadline(now, config, active, wentIdle) {
     let deadline = now;
 
     if (wentIdle) deadline = Math.min(deadline, now - config.idleSeconds * 1000);
 
-    // Ein hoerbarer Tab gilt als Nutzung, da braucht es keine Interaktion.
+    // An audible tab counts as usage, no interaction needed.
     const audibleExempt = config.audibleCountsAsActive && active && active.audible;
     if (config.requireInteraction && !audibleExempt) {
         const { lastInteraction } = await sessionState();
@@ -144,7 +143,7 @@ async function segmentDeadline(now, config, active, wentIdle) {
     return deadline;
 }
 
-/** Rechnet das laufende Segment ab (hoechstens bis `until`). */
+/** Books the running segment (at most up to `until`). */
 async function settle(active, until) {
     if (!active) return null;
 
@@ -157,8 +156,8 @@ async function settle(active, until) {
 }
 
 /**
- * Kernroutine: laufendes Segment abrechnen, neu bestimmen was aktiv ist.
- * Wird von jedem Ereignis und vom Alarm aufgerufen.
+ * Core routine: book the running segment, then work out what's active now.
+ * Called by every event and by the alarm.
  */
 function tick({ wentIdle = false } = {}) {
     return serialize(async () => {
@@ -176,13 +175,13 @@ function tick({ wentIdle = false } = {}) {
                 : null,
         });
 
-        // Erst nach dem Buchen pruefen, sonst haengt die Warnung eine Runde nach.
+        // Check only after booking, or the warning would lag a round behind.
         const domain = settledDomain || (target && target.domain);
         if (domain) await checkLimits(domain, now);
     });
 }
 
-/** Limitwarnung und – falls faellig – Sperre. */
+/** Limit warning and – once due – blocking. */
 async function checkLimits(domain, now) {
     const config = await settings();
     const usage = await getUsage();
@@ -192,9 +191,9 @@ async function checkLimits(domain, now) {
     await enforce(config, now);
 }
 
-/* ------------------------------------------------------------------ Sperre */
+/* ---------------------------------------------------------------------- Block */
 
-/** Leitet alle Tabs gesperrter Domains auf die Sperrseite um. */
+/** Redirects every tab on a blocked domain to the block page. */
 async function enforce(config, now = Date.now()) {
     try {
         const snooze = await getSnooze();
@@ -217,11 +216,11 @@ async function enforce(config, now = Date.now()) {
             await chrome.tabs.update(tab.id, { url: blockedUrl(domain, tab.url, reason) });
         }
     } catch {
-        // Einzelne Tabs koennen verschwinden – kein Grund, den Rest abzubrechen.
+        // Individual tabs can disappear – no reason to abort the rest.
     }
 }
 
-/* ------------------------------------------------------------------- Events */
+/* --------------------------------------------------------------------- Events */
 
 chrome.tabs.onActivated.addListener(() => tick());
 chrome.tabs.onRemoved.addListener((tabId) => {
@@ -233,9 +232,9 @@ chrome.idle.onStateChanged.addListener((state) => tick({ wentIdle: state !== "ac
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (!changeInfo.url) return;
-    forgetTab(tabId); // Neue Seite, alter Kanalname gilt nicht mehr.
+    forgetTab(tabId); // New page, the old channel name no longer applies.
     if (tab.active) tick();
-    else settings().then((config) => enforce(config)); // Auch Hintergrundtabs sperren.
+    else settings().then((config) => enforce(config)); // Block background tabs too.
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
@@ -255,25 +254,25 @@ async function forgetTab(tabId) {
     }
 }
 
-/* ---------------------------------------------------------------- Nachrichten */
+/* ------------------------------------------------------------------- Messages */
 
 const handlers = {
-    /** Popup laesst vor dem Rendern abrechnen, damit die laufende Zeit stimmt. */
+    /** The popup asks for a flush before rendering, so running time is included. */
     async sync() {
         await tick();
         return { ok: true };
     },
 
-    /** Content-Script meldet Maus, Tastatur oder Scrollen. */
+    /** The content script reports a mouse, keyboard or scroll event. */
     async interaction() {
         await chrome.storage.session.set({ lastInteraction: Date.now() });
         const config = await settings();
-        // Ohne die Option aendert eine Interaktion nichts am Ergebnis.
+        // Without the option, an interaction doesn't change the result.
         if (config.requireInteraction) await tick();
         return { ok: true };
     },
 
-    /** Content-Script liefert den Kanalnamen einer YouTube-Videoseite nach. */
+    /** The content script supplies the channel name of a YouTube video page. */
     async entity(message, sender) {
         if (!sender.tab || !message.label) return { ok: false };
         const { tabEntity } = await sessionState();
@@ -283,14 +282,14 @@ const handlers = {
         return { ok: true };
     },
 
-    /** Sperrseite bittet um eine kurze Ausnahme. */
+    /** The block page asks for a brief exception. */
     async snooze(message) {
         if (!message.domain) return { ok: false };
         await setSnooze(message.domain, Date.now() + SNOOZE_MS);
         return { ok: true, until: Date.now() + SNOOZE_MS };
     },
 
-    /** Optionsseite hat Einstellungen geaendert – sofort anwenden. */
+    /** The options page changed a setting – apply it right away. */
     async settingsChanged() {
         settingsCache = null;
         const config = await settings();
@@ -299,7 +298,7 @@ const handlers = {
         return { ok: true };
     },
 
-    /** Optionsseite stoesst den Geraeteabgleich von Hand an. */
+    /** The options page triggers a manual device sync. */
     async pushSync() {
         const config = await settings();
         if (!config.syncUsage) return { ok: false, reason: "disabled" };
@@ -315,12 +314,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     handler(message, sender)
         .then(sendResponse)
         .catch((error) => sendResponse({ ok: false, error: String(error) }));
-    return true; // Antwort kommt asynchron.
+    return true; // The reply arrives asynchronously.
 });
 
-/* ------------------------------------------------------------------- Wartung */
+/* ------------------------------------------------------------------- Maintenance */
 
-/** Stuendlich: aufraeumen, Wochenreport pruefen, Geraeteabgleich schreiben. */
+/** Hourly: clean up, check the weekly report, write the device sync. */
 async function maintenance() {
     try {
         const config = await settings();
@@ -328,11 +327,11 @@ async function maintenance() {
         await maybeCreateWeeklyReport(config);
         if (config.syncUsage) await sync.push(config.syncDays);
     } catch {
-        // Wartung darf das Tracking nie stoppen.
+        // Maintenance must never stop tracking.
     }
 }
 
-/* ------------------------------------------------------------------ Startup */
+/* ----------------------------------------------------------------------- Startup */
 
 async function init() {
     const config = await settings();
@@ -349,7 +348,7 @@ async function init() {
 chrome.runtime.onInstalled.addListener(() => init());
 chrome.runtime.onStartup.addListener(() => init());
 
-// Der Service Worker wird auch ausserhalb dieser beiden Ereignisse neu
-// gestartet (z.B. nach Idle-Shutdown). Dann muss der aktive Tab sofort wieder
-// erfasst werden, sonst zaehlt gar nichts, bis der Nutzer den Tab wechselt.
+// The service worker also restarts outside of those two events (e.g. after an
+// idle shutdown). The active tab must be picked up again immediately, or
+// nothing counts until the user switches tabs.
 tick();

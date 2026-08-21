@@ -1,20 +1,20 @@
-/** Export und Import der Nutzungsdaten. */
+/** Export and import of usage data. */
 
 import { getUsage, getDetail, serialize } from "./storage.js";
 import { getSettings, saveSettings } from "./settings.js";
 
-/** CSV-Feld: Trennzeichen, Anfuehrungszeichen und Umbrueche maskieren. */
+/** CSV field: escape the delimiter, quotes and line breaks. */
 function csvField(value) {
     const text = String(value ?? "");
     return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
 /**
- * Eine Zeile je Tag und Domain – so laesst sich die Datei direkt in einer
- * Tabellenkalkulation als Pivot auswerten.
+ * One row per day and domain – so the file can be pivoted directly in any
+ * spreadsheet tool.
  */
 export function toCSV(usage) {
-    const rows = [["Datum", "Domain", "Sekunden", "Minuten", "Stunden"]];
+    const rows = [["Date", "Domain", "Seconds", "Minutes", "Hours"]];
 
     for (const day of Object.keys(usage).sort()) {
         const bucket = usage[day] || {};
@@ -29,11 +29,11 @@ export function toCSV(usage) {
             ]);
         }
     }
-    // BOM voran, sonst zerlegt Excel Umlaute in Domainnamen.
+    // Leading BOM, or Excel mangles accented characters in domain names.
     return "﻿" + rows.map((row) => row.map(csvField).join(",")).join("\r\n");
 }
 
-/** Vollstaendiges Backup inklusive Unterobjekten und Einstellungen. */
+/** Full backup including sub-entities and settings. */
 export async function toJSON() {
     return JSON.stringify(
         {
@@ -50,18 +50,18 @@ export async function toJSON() {
 }
 
 /**
- * Backup einlesen. `mode` entscheidet, was mit vorhandenen Daten passiert:
- * "merge" addiert, "replace" ersetzt sie.
+ * Reads a backup back in. `mode` decides what happens to existing data:
+ * "merge" adds to it, "replace" overwrites it.
  */
 export async function importJSON(text, mode = "merge") {
     let data;
     try {
         data = JSON.parse(text);
     } catch {
-        throw new Error("Datei ist kein gueltiges JSON.");
+        throw new Error("That file isn't valid JSON.");
     }
     if (!data || data.format !== "WebsiteTimeTrack" || typeof data.usage !== "object") {
-        throw new Error("Das ist kein WebsiteTimeTrack-Backup.");
+        throw new Error("That isn't a WebsiteTimeTrack backup.");
     }
 
     await serialize(async () => {
@@ -99,7 +99,7 @@ export async function importJSON(text, mode = "merge") {
     return { days };
 }
 
-/** Loest den Download aus. Nur von Extension-Seiten aus aufrufen. */
+/** Triggers the download. Only call this from extension pages. */
 export function download(filename, content, mime) {
     const url = URL.createObjectURL(new Blob([content], { type: mime }));
     const link = document.createElement("a");
@@ -108,6 +108,6 @@ export function download(filename, content, mime) {
     document.body.appendChild(link);
     link.click();
     link.remove();
-    // Erst nach dem Klick freigeben, sonst bricht der Download ab.
+    // Revoke only after the click, or the download gets cancelled.
     setTimeout(() => URL.revokeObjectURL(url), 10000);
 }

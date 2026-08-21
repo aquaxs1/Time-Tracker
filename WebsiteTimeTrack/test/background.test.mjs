@@ -1,6 +1,6 @@
 /**
- * Integrationstests des Service Workers gegen den Chrome-Mock.
- * Jeder Test startet den Worker frisch – wie nach einem Idle-Shutdown.
+ * Integration tests for the service worker against the Chrome mock.
+ * Every test boots the worker fresh – as if after an idle shutdown.
  */
 
 import test from "node:test";
@@ -21,9 +21,9 @@ const tick = (ms) => (now += ms);
 let loadCounter = 0;
 
 /**
- * Startet den Service Worker mit frischem Zustand.
- * Der Query-Parameter umgeht den ES-Modul-Cache – ohne ihn liefe der
- * Modulrumpf kein zweites Mal und es wuerden keine Listener registriert.
+ * Boots the service worker with fresh state.
+ * The query parameter dodges the ES module cache – without it the module
+ * body wouldn't run a second time and no listeners would register.
  */
 async function boot(world) {
     const chrome = install(world);
@@ -32,7 +32,7 @@ async function boot(world) {
     return chrome;
 }
 
-/** Welt mit einem aktiven Tab auf `url`. */
+/** A world with one active tab on `url`. */
 function worldWith(url, extra = {}) {
     return makeWorld({
         tabs: [{ id: 1, url, active: true, windowId: 1, audible: false }],
@@ -40,7 +40,7 @@ function worldWith(url, extra = {}) {
     });
 }
 
-/** Einstellungen so ablegen, wie getSettings() sie liest. */
+/** Stores settings the way getSettings() reads them. */
 function withSettings(world, settings) {
     world.sync.settings = settings;
     return world;
@@ -48,42 +48,43 @@ function withSettings(world, settings) {
 
 const alarm = (chrome) => fire(chrome, "alarm", { name: "flush" });
 
-/* ------------------------------------------------------------- Grundmessung */
+/* --------------------------------------------------------------- Baseline */
 
-test("aktiver Tab wird beim Start des Workers sofort erfasst", async () => {
+test("the active tab is captured the moment the worker starts", async () => {
     const world = worldWith("https://www.youtube.com/watch?v=1");
     const chrome = await boot(world);
 
-    assert.equal(world.session.active.domain, "youtube.com", "www. wird gestrippt");
+    assert.equal(world.session.active.domain, "youtube.com", "www. is stripped");
 
     tick(30_000);
     await alarm(chrome);
     assert.equal(totalFor(world.local, "youtube.com"), 30_000);
 });
 
-test("Idle stoppt die Messung und die Rueckkehr startet sie wieder", async () => {
+test("idle stops the measurement, and coming back starts it again", async () => {
     const world = worldWith("https://github.com/x/y");
     const chrome = await boot(world);
 
-    // Chrome meldet den Idle-Zustand erst nach Ablauf der Schwelle (60 s).
-    // Untaetig war der Nutzer da schon eine Minute – nur die 10 s davor zaehlen.
+    // Chrome only reports the idle state after the threshold (60 s) has
+    // elapsed. The user was already inactive for a minute – only the 10 s
+    // before that should count.
     tick(70_000);
     world.idleState = "idle";
     await fire(chrome, "idle", "idle");
-    assert.equal(totalFor(world.local, "github.com"), 10_000, "Idle-Schwelle abgezogen");
+    assert.equal(totalFor(world.local, "github.com"), 10_000, "idle threshold subtracted");
 
     tick(600_000);
     await alarm(chrome);
-    assert.equal(totalFor(world.local, "github.com"), 10_000, "Idle-Zeit zaehlt nicht");
+    assert.equal(totalFor(world.local, "github.com"), 10_000, "idle time doesn't count");
 
     world.idleState = "active";
     await fire(chrome, "idle", "active");
     tick(5_000);
     await alarm(chrome);
-    assert.equal(totalFor(world.local, "github.com"), 15_000, "danach wieder aktiv");
+    assert.equal(totalFor(world.local, "github.com"), 15_000, "active again afterwards");
 });
 
-test("ohne fokussiertes Fenster laeuft die Uhr nicht", async () => {
+test("the clock doesn't run without a focused window", async () => {
     const world = worldWith("https://news.ycombinator.com/");
     const chrome = await boot(world);
 
@@ -96,7 +97,7 @@ test("ohne fokussiertes Fenster laeuft die Uhr nicht", async () => {
     assert.equal(totalFor(world.local, "news.ycombinator.com"), 8_000);
 });
 
-test("Tabwechsel bucht auf die jeweils richtige Domain", async () => {
+test("switching tabs books time to the right domain each time", async () => {
     const world = worldWith("https://a.example/");
     const chrome = await boot(world);
 
@@ -110,13 +111,13 @@ test("Tabwechsel bucht auf die jeweils richtige Domain", async () => {
     assert.equal(totalFor(world.local, "b.example"), 6_000);
 });
 
-test("chrome:// und Tabs ohne URL stuerzen nicht ab", async () => {
+test("chrome:// and tabs without a URL don't crash anything", async () => {
     const world = worldWith("chrome://extensions");
     const chrome = await boot(world);
 
     tick(5_000);
     await alarm(chrome);
-    assert.equal(world.local.usage, undefined, "nichts gebucht");
+    assert.equal(world.local.usage, undefined, "nothing booked");
 
     world.tabs = [{ id: 3, url: undefined, active: true, windowId: 1 }];
     await fire(chrome, "tabActivated", { tabId: 3 });
@@ -124,16 +125,16 @@ test("chrome:// und Tabs ohne URL stuerzen nicht ab", async () => {
     await alarm(chrome);
 });
 
-test("Standby erzeugt keine Fantasiezeiten", async () => {
+test("standby never creates fictional time", async () => {
     const world = worldWith("https://sleep.example/");
     const chrome = await boot(world);
 
-    tick(8 * 60 * 60 * 1000); // Laptop zugeklappt, kein Event gefeuert
+    tick(8 * 60 * 60 * 1000); // laptop closed, no event fired
     await alarm(chrome);
     assert.equal(totalFor(world.local, "sleep.example"), 0);
 });
 
-test("Segmente ueber Mitternacht landen auf beiden Tagen", async () => {
+test("segments crossing midnight land on both days", async () => {
     now = new Date(2026, 7, 20, 23, 59).getTime();
     const world = worldWith("https://late.example/");
     const chrome = await boot(world);
@@ -146,11 +147,11 @@ test("Segmente ueber Mitternacht landen auf beiden Tagen", async () => {
     now = new Date(2026, 7, 20, 10).getTime();
 });
 
-/* ------------------------------------------------------------- Ignorierliste */
+/* -------------------------------------------------------------- Ignore list */
 
-test("ignorierte Domains werden gar nicht erfasst", async () => {
-    const world = withSettings(worldWith("https://intern.firma.de/x"), {
-        ignore: ["firma.de"],
+test("ignored domains are never captured at all", async () => {
+    const world = withSettings(worldWith("https://internal.company.example/x"), {
+        ignore: ["company.example"],
     });
     const chrome = await boot(world);
 
@@ -160,37 +161,37 @@ test("ignorierte Domains werden gar nicht erfasst", async () => {
     assert.equal(world.session.active, null);
 });
 
-/* -------------------------------------------------------------- Interaktion */
+/* --------------------------------------------------------------- Interaction */
 
-test("ohne Interaktion zaehlt ein offener Tab nicht", async () => {
+test("an open tab doesn't count without interaction", async () => {
     const world = withSettings(worldWith("https://video.example/"), {
         requireInteraction: true,
         interactionTimeoutSeconds: 90,
     });
     const chrome = await boot(world);
 
-    assert.equal(world.session.active, null, "noch keine Interaktion gemeldet");
+    assert.equal(world.session.active, null, "no interaction reported yet");
 
     await sendMessage(chrome, { type: "interaction" }, { tab: { id: 1 } });
     await settleQueue();
-    assert.equal(world.session.active.domain, "video.example", "nach Interaktion laeuft es");
+    assert.equal(world.session.active.domain, "video.example", "counts once interaction happens");
 
     tick(20_000);
     await alarm(chrome);
     assert.equal(totalFor(world.local, "video.example"), 20_000);
 
-    // Ohne weitere Interaktion endet die Nutzung mit dem 90-Sekunden-Fenster –
-    // nicht erst, wenn der naechste Alarm das Ende bemerkt.
+    // Without another interaction, usage ends with the 90-second window –
+    // not only once the next alarm notices.
     tick(200_000);
     await alarm(chrome);
-    assert.equal(totalFor(world.local, "video.example"), 90_000, "auf das Fenster gekappt");
+    assert.equal(totalFor(world.local, "video.example"), 90_000, "capped at the window");
 
     tick(200_000);
     await alarm(chrome);
-    assert.equal(totalFor(world.local, "video.example"), 90_000, "danach nichts mehr");
+    assert.equal(totalFor(world.local, "video.example"), 90_000, "nothing further after that");
 });
 
-test("Tabs mit Ton zaehlen auch ohne Interaktion", async () => {
+test("tabs with audio count even without interaction", async () => {
     const world = withSettings(
         makeWorld({
             tabs: [{ id: 1, url: "https://video.example/", active: true, windowId: 1, audible: true }],
@@ -204,21 +205,21 @@ test("Tabs mit Ton zaehlen auch ohne Interaktion", async () => {
     assert.equal(totalFor(world.local, "video.example"), 30_000);
 });
 
-/* ------------------------------------------------------------ Unterobjekte */
+/* ------------------------------------------------------------------ Sub-entities */
 
-test("GitHub-Repo wird aus der URL erfasst", async () => {
+test("a GitHub repo is captured from the URL", async () => {
     const world = worldWith("https://github.com/aquaxs1/Time-Tracker/pull/1");
     const chrome = await boot(world);
 
     tick(30_000);
     await alarm(chrome);
     assert.equal(
-        world.local.detail["2026-08-20"]["github.com"]["Repo: aquaxs1/Time-Tracker"],
+        world.local.detail["2026-08-20"]["github.com"]["Repository: aquaxs1/Time-Tracker"],
         30_000,
     );
 });
 
-test("YouTube-Kanal kommt aus dem Content-Script", async () => {
+test("a YouTube channel comes from the content script", async () => {
     const world = worldWith("https://www.youtube.com/watch?v=abc");
     const chrome = await boot(world);
 
@@ -230,15 +231,15 @@ test("YouTube-Kanal kommt aus dem Content-Script", async () => {
     await alarm(chrome);
 
     const detail = world.local.detail["2026-08-20"]["youtube.com"];
-    assert.equal(detail["Kanal: Kurzgesagt"], 20_000);
-    assert.equal(totalFor(world.local, "youtube.com"), 30_000, "Domain zaehlt die ganze Zeit");
+    assert.equal(detail["Channel: Kurzgesagt"], 20_000);
+    assert.equal(totalFor(world.local, "youtube.com"), 30_000, "the domain counts the whole time");
 });
 
-test("Navigation verwirft den Kanalnamen des alten Videos", async () => {
+test("navigating drops the previous video's channel name", async () => {
     const world = worldWith("https://www.youtube.com/watch?v=abc");
     const chrome = await boot(world);
 
-    await sendMessage(chrome, { type: "entity", label: "Kanal A" }, { tab: { id: 1 } });
+    await sendMessage(chrome, { type: "entity", label: "Channel A" }, { tab: { id: 1 } });
     await settleQueue();
 
     world.tabs[0].url = "https://www.youtube.com/watch?v=xyz";
@@ -247,35 +248,35 @@ test("Navigation verwirft den Kanalnamen des alten Videos", async () => {
     tick(20_000);
     await alarm(chrome);
     const detail = ((world.local.detail || {})["2026-08-20"] || {})["youtube.com"] || {};
-    assert.equal(detail["Kanal: Kanal A"], undefined, "alter Kanal wird nicht weitergezaehlt");
-    assert.equal(totalFor(world.local, "youtube.com"), 20_000, "die Domain zaehlt weiter");
+    assert.equal(detail["Channel: Channel A"], undefined, "the old channel stops accruing time");
+    assert.equal(totalFor(world.local, "youtube.com"), 20_000, "the domain keeps counting");
 });
 
-/* ------------------------------------------------------------------ Limits */
+/* ------------------------------------------------------------------------ Limits */
 
-test("Warnung bei 80 Prozent, Meldung bei 100 Prozent", async () => {
+test("a warning at 80 percent, a notification at 100 percent", async () => {
     const world = withSettings(worldWith("https://youtube.com/feed"), {
         limits: { "youtube.com": { minutes: 10, block: false } },
         notifyAtPercent: 80,
     });
-    // 8 von 10 Minuten sind schon zusammengekommen.
+    // 8 of 10 minutes are already used up.
     world.local.usage = { "2026-08-20": { "youtube.com": 8 * 60000 } };
     const chrome = await boot(world);
 
     await alarm(chrome);
-    assert.equal(world.notifications.length, 1, "eine Warnung");
-    assert.match(world.notifications[0].title, /Bald am Limit/);
+    assert.equal(world.notifications.length, 1, "one warning");
+    assert.match(world.notifications[0].title, /Almost at the limit/);
 
     await alarm(chrome);
-    assert.equal(world.notifications.length, 1, "nicht doppelt warnen");
+    assert.equal(world.notifications.length, 1, "no duplicate warning");
 
     world.local.usage["2026-08-20"]["youtube.com"] = 10 * 60000;
     await alarm(chrome);
     assert.equal(world.notifications.length, 2);
-    assert.match(world.notifications[1].title, /Limit erreicht/);
+    assert.match(world.notifications[1].title, /Limit reached/);
 });
 
-test("erreichtes Limit sperrt den Tab, Snooze gibt ihn frei", async () => {
+test("a reached limit blocks the tab, snooze frees it up", async () => {
     const world = withSettings(worldWith("https://reddit.com/r/de"), {
         limits: { "reddit.com": { minutes: 5, block: true } },
     });
@@ -283,25 +284,25 @@ test("erreichtes Limit sperrt den Tab, Snooze gibt ihn frei", async () => {
     const chrome = await boot(world);
 
     await alarm(chrome);
-    assert.equal(world.updated.length, 1, "Tab wurde umgeleitet");
+    assert.equal(world.updated.length, 1, "the tab was redirected");
     assert.match(world.updated[0].url, /blocked\.html\?d=reddit\.com/);
     assert.match(world.updated[0].url, /r=limit/);
 
-    // Ausnahme anfordern und wieder auf die Seite zurueck.
+    // Request an exception and go back to the page.
     const response = await sendMessage(chrome, { type: "snooze", domain: "reddit.com" });
     assert.equal(response.ok, true);
 
     world.tabs[0].url = "https://reddit.com/r/de";
     world.updated.length = 0;
     await alarm(chrome);
-    assert.equal(world.updated.length, 0, "waehrend des Snooze keine Sperre");
+    assert.equal(world.updated.length, 0, "no block during the snooze");
 
-    tick(6 * 60 * 1000); // Snooze abgelaufen
+    tick(6 * 60 * 1000); // snooze expired
     await alarm(chrome);
-    assert.equal(world.updated.length, 1, "danach wieder gesperrt");
+    assert.equal(world.updated.length, 1, "blocked again afterwards");
 });
 
-test("Fokusmodus sperrt Ablenkung, laesst Arbeit durch", async () => {
+test("focus mode blocks distraction, lets work through", async () => {
     const world = withSettings(
         makeWorld({
             tabs: [
@@ -315,11 +316,11 @@ test("Fokusmodus sperrt Ablenkung, laesst Arbeit durch", async () => {
 
     await alarm(chrome);
     assert.equal(world.updated.length, 1);
-    assert.equal(world.updated[0].tabId, 1, "nur der Social-Tab");
+    assert.equal(world.updated[0].tabId, 1, "only the social tab");
     assert.match(world.updated[0].url, /r=focus/);
 });
 
-test("abgelaufener Fokusmodus sperrt nicht mehr", async () => {
+test("expired focus mode no longer blocks", async () => {
     const world = withSettings(worldWith("https://instagram.com/"), {
         focus: { active: true, until: now - 1000, sites: [] },
     });
@@ -329,11 +330,11 @@ test("abgelaufener Fokusmodus sperrt nicht mehr", async () => {
     assert.equal(world.updated.length, 0);
 });
 
-/* ------------------------------------------------------------- Wartung */
+/* --------------------------------------------------------------------- Maintenance */
 
-test("Wochenreport entsteht einmal pro Woche", async () => {
+test("the weekly report is created once per week", async () => {
     const world = withSettings(worldWith("https://example.com/"), { weeklyReport: true });
-    // Vorwoche mit Daten fuellen (Mo 10.8. bis So 16.8.2026).
+    // Fill the previous week with data (Mon 8/10 through Sun 8/16, 2026).
     world.local.usage = {
         "2026-08-11": { "github.com": 3600000 },
         "2026-08-13": { "netflix.com": 1800000 },
@@ -348,42 +349,42 @@ test("Wochenreport entsteht einmal pro Woche", async () => {
     assert.equal(notifications.length, 1);
 
     await fire(chrome, "alarm", { name: "maintenance" });
-    assert.equal(world.local.reports.length, 1, "kein zweiter Report fuer dieselbe Woche");
+    assert.equal(world.local.reports.length, 1, "no second report for the same week");
 });
 
-test("alte Tage werden aufgeraeumt", async () => {
+test("old days get cleaned up", async () => {
     const world = worldWith("https://example.com/");
     world.local.usage = {
         "2026-08-19": { "a.com": 1000 },
-        "2024-01-01": { "alt.com": 1000 },
+        "2024-01-01": { "old.com": 1000 },
     };
     const chrome = await boot(world);
 
     await fire(chrome, "alarm", { name: "maintenance" });
-    assert.ok(world.local.usage["2026-08-19"], "junge Tage bleiben");
-    assert.equal(world.local.usage["2024-01-01"], undefined, "alte Tage fliegen raus");
+    assert.ok(world.local.usage["2026-08-19"], "recent days stay");
+    assert.equal(world.local.usage["2024-01-01"], undefined, "old days are dropped");
 });
 
-/* ---------------------------------------------------------------- Migration */
+/* --------------------------------------------------------------------- Migration */
 
-test("Daten aus Version 1.0 werden uebernommen", async () => {
-    const world = worldWith("https://neu.example/");
+test("data from version 1.0 is carried over", async () => {
+    const world = worldWith("https://new.example/");
     world.local = { "youtube.com": 3600, "old.example": 90, notanumber: "x" };
     const chrome = await boot(world);
 
     await fire(chrome, "installed");
     await settleQueue();
 
-    assert.equal(world.local.usage["2026-08-20"]["youtube.com"], 3_600_000, "Sekunden zu ms");
+    assert.equal(world.local.usage["2026-08-20"]["youtube.com"], 3_600_000, "seconds to ms");
     assert.equal(world.local.usage["2026-08-20"]["old.example"], 90_000);
-    assert.equal(world.local["youtube.com"], undefined, "alte Keys entfernt");
-    assert.equal(world.local.notanumber, "x", "fremde Keys bleiben");
+    assert.equal(world.local["youtube.com"], undefined, "old keys removed");
+    assert.equal(world.local.notanumber, "x", "unrelated keys are left alone");
     assert.equal(world.local.meta.schema, 3);
 });
 
-/* -------------------------------------------------------------- Nachrichten */
+/* ---------------------------------------------------------------------- Messages */
 
-test("Popup erzwingt die Abrechnung der laufenden Zeit", async () => {
+test("the popup forces a flush of running time", async () => {
     const world = worldWith("https://msg.example/");
     const chrome = await boot(world);
 
@@ -393,7 +394,7 @@ test("Popup erzwingt die Abrechnung der laufenden Zeit", async () => {
     assert.equal(totalFor(world.local, "msg.example"), 3_000);
 });
 
-test("geaenderte Einstellungen wirken sofort", async () => {
+test("changed settings take effect immediately", async () => {
     const world = worldWith("https://instagram.com/");
     const chrome = await boot(world);
 
@@ -401,16 +402,16 @@ test("geaenderte Einstellungen wirken sofort", async () => {
     await alarm(chrome);
     assert.equal(world.updated.length, 0);
 
-    // Fokusmodus einschalten, wie es die Optionsseite tut.
+    // Turn on focus mode, the way the options page does.
     world.sync.settings = { focus: { active: true, until: now + 600000, sites: [] } };
     await sendMessage(chrome, { type: "settingsChanged" });
     await settleQueue();
 
-    assert.equal(world.updated.length, 1, "Sperre greift ohne Neustart");
+    assert.equal(world.updated.length, 1, "the block applies without a restart");
 });
 
-test("unbekannte Nachrichten werden nicht beantwortet", async () => {
+test("unknown messages get no reply", async () => {
     const world = worldWith("https://example.com/");
     const chrome = await boot(world);
-    assert.equal(await sendMessage(chrome, { type: "gibtsnicht" }), undefined);
+    assert.equal(await sendMessage(chrome, { type: "doesNotExist" }), undefined);
 });

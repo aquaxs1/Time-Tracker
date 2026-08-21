@@ -1,8 +1,17 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Gesperrt – WebsiteTimeTrack</title>
+    <script>
+        // Sets the theme before the stylesheet is even parsed, avoiding a
+        // flash of the wrong theme. The real source of truth (chrome.storage)
+        // is applied a moment later by blocked.js via lib/theme.js.
+        try {
+            var t = localStorage.getItem("theme");
+            if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+        } catch (e) {}
+    </script>
+    <title>Blocked – WebsiteTimeTrack</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="page block-page">
@@ -13,8 +22,8 @@
         <p id="detail" class="block-detail"></p>
 
         <div class="block-actions">
-            <button id="snooze" type="button" class="button">5 Minuten trotzdem</button>
-            <button id="options" type="button" class="button ghost">Einstellungen</button>
+            <button id="snooze" type="button" class="button">5 more minutes</button>
+            <button id="options" type="button" class="button ghost">Settings</button>
         </div>
         <p id="note" class="block-note"></p>
     </main>

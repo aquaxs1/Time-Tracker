@@ -1,13 +1,13 @@
 /**
- * Domain- und Unterobjekt-Erkennung.
+ * Domain and sub-entity detection.
  *
- * Reine Domain-Statistik ist grob: "youtube.com 4 h" sagt wenig, "youtube.com /
- * Kanal Kurzgesagt 40 min" schon mehr. Wo sich das Unterobjekt aus der URL
- * ablesen laesst, passiert das hier. YouTube-Videoseiten tragen den Kanalnamen
- * nicht in der URL – den liefert das Content-Script nach.
+ * Plain domain stats are coarse: "youtube.com 4 h" says little, "youtube.com /
+ * Channel Kurzgesagt 40 min" says a lot more. Where a sub-entity can be read
+ * straight off the URL, this is where that happens. YouTube video pages don't
+ * carry the channel name in the URL – the content script supplies that.
  */
 
-/** Hostname einer trackbaren URL, sonst null. */
+/** Hostname of a trackable URL, or null. */
 export function domainOf(url) {
     if (!url) return null;
     let parsed;
@@ -21,18 +21,18 @@ export function domainOf(url) {
     return parsed.hostname.replace(/^www\./, "");
 }
 
-/** Pfadsegmente ohne leere Teile. */
+/** Path segments with empty parts removed. */
 function segments(pathname) {
     return pathname.split("/").filter(Boolean);
 }
 
 const EXTRACTORS = {
     "youtube.com": (parts) => {
-        if (parts[0] && parts[0].startsWith("@")) return { kind: "Kanal", label: parts[0] };
+        if (parts[0] && parts[0].startsWith("@")) return { kind: "Channel", label: parts[0] };
         if (["c", "user", "channel"].includes(parts[0]) && parts[1]) {
-            return { kind: "Kanal", label: parts[1] };
+            return { kind: "Channel", label: parts[1] };
         }
-        return null; // /watch – kommt aus dem Content-Script.
+        return null; // /watch – comes from the content script instead.
     },
     "github.com": (parts) => {
         const reserved = new Set([
@@ -40,34 +40,34 @@ const EXTRACTORS = {
             "issues", "search", "orgs", "topics", "sponsors", "codespaces",
         ]);
         if (parts.length >= 2 && !reserved.has(parts[0])) {
-            return { kind: "Repo", label: `${parts[0]}/${parts[1]}` };
+            return { kind: "Repository", label: `${parts[0]}/${parts[1]}` };
         }
         return null;
     },
     "gitlab.com": (parts) =>
         parts.length >= 2 && !parts[0].startsWith("-")
-            ? { kind: "Repo", label: `${parts[0]}/${parts[1]}` }
+            ? { kind: "Repository", label: `${parts[0]}/${parts[1]}` }
             : null,
     "reddit.com": (parts) =>
         parts[0] === "r" && parts[1] ? { kind: "Subreddit", label: `r/${parts[1]}` } : null,
     "twitch.tv": (parts) => {
         const reserved = new Set(["directory", "settings", "videos", "search", "subscriptions"]);
-        return parts[0] && !reserved.has(parts[0]) ? { kind: "Kanal", label: parts[0] } : null;
+        return parts[0] && !reserved.has(parts[0]) ? { kind: "Channel", label: parts[0] } : null;
     },
     "x.com": (parts) => {
         const reserved = new Set(["home", "explore", "notifications", "messages", "settings", "i", "search"]);
-        return parts[0] && !reserved.has(parts[0]) ? { kind: "Profil", label: `@${parts[0]}` } : null;
+        return parts[0] && !reserved.has(parts[0]) ? { kind: "Profile", label: `@${parts[0]}` } : null;
     },
     "stackoverflow.com": (parts) =>
-        parts[0] === "questions" && parts[2] ? { kind: "Frage", label: parts[2].slice(0, 60) } : null,
+        parts[0] === "questions" && parts[2] ? { kind: "Question", label: parts[2].slice(0, 60) } : null,
 };
 
 EXTRACTORS["twitter.com"] = EXTRACTORS["x.com"];
 
 /**
- * Unterobjekt aus der URL, sonst null.
- * `genericDomains` erlaubt es, fuer beliebige Domains das erste Pfadsegment
- * als Unterobjekt zu nehmen (Einstellung auf der Optionsseite).
+ * Sub-entity read from the URL, or null.
+ * `genericDomains` lets any domain use its first path segment as a sub-entity
+ * (a setting on the options page).
  */
 export function subEntityOf(url, genericDomains = []) {
     const domain = domainOf(url);
@@ -91,12 +91,12 @@ export function subEntityOf(url, genericDomains = []) {
     }
 
     if (genericDomains.includes(domain) && parts[0]) {
-        return { kind: "Bereich", label: `/${parts[0]}` };
+        return { kind: "Section", label: `/${parts[0]}` };
     }
     return null;
 }
 
-/** Ist das eine YouTube-Videoseite? Dann liefert das Content-Script den Kanal. */
+/** Is this a YouTube video page? Then the content script supplies the channel. */
 export function needsPageLookup(url) {
     const domain = domainOf(url);
     if (domain !== "youtube.com") return false;
@@ -108,9 +108,9 @@ export function needsPageLookup(url) {
 }
 
 /**
- * Prueft eine Domain gegen Ignorier-/Blockmuster.
- * Unterstuetzt exakte Domains, Subdomains (`example.com` trifft `a.example.com`)
- * und fuehrende Wildcards (`*.intern.example`).
+ * Checks a domain against ignore/block patterns.
+ * Supports exact domains, subdomains (`example.com` matches `a.example.com`),
+ * and leading wildcards (`*.intern.example`).
  */
 export function matchesPattern(domain, pattern) {
     if (!domain || !pattern) return false;
@@ -120,7 +120,7 @@ export function matchesPattern(domain, pattern) {
     return target === clean || target.endsWith(`.${clean}`);
 }
 
-/** Trifft die Domain irgendeines der Muster? */
+/** Does the domain match any of the patterns? */
 export function matchesAny(domain, patterns = []) {
     return patterns.some((pattern) => matchesPattern(domain, pattern));
 }

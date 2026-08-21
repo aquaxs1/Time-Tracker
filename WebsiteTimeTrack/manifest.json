@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "WebsiteTimeTrack",
-  "version": "2.0.0",
-  "description": "Misst lokal, wie lange du auf welcher Website bist – mit Limits, Fokusmodus, Kategorien und Wochenreport.",
+  "version": "2.1.0",
+  "description": "Measures your time on every website, locally – with limits, focus mode, categories and a weekly report.",
   "minimum_chrome_version": "110",
   "permissions": [
     "tabs",

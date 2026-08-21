@@ -1,4 +1,4 @@
-/** Optionsseite: alle Einstellungen, Kategoriezuordnung, Report und Datenexport. */
+/** Options page: all settings, category assignment, report and data export. */
 
 import { formatDuration, formatMinutes } from "./lib/time.js";
 import { aggregate, getReports, getUsage } from "./lib/storage.js";
@@ -7,13 +7,14 @@ import { getSettings, saveSettings } from "./lib/settings.js";
 import { download, importJSON, toCSV, toJSON } from "./lib/export.js";
 import * as sync from "./lib/sync.js";
 import { reportSummary } from "./lib/report.js";
+import { applyTheme } from "./lib/theme.js";
 
 const el = (id) => document.getElementById(id);
 const CATEGORY_ROW_LIMIT = 40;
 
 let settings = null;
 
-/* ------------------------------------------------------------------ Helfer */
+/* ------------------------------------------------------------------ Helpers */
 
 function linesToList(text) {
     return text
@@ -30,13 +31,13 @@ function flashSaved() {
     savedTimer = setTimeout(() => (badge.hidden = true), 1500);
 }
 
-/** Schreibt die Einstellungen und laesst den Service Worker sofort reagieren. */
+/** Writes the settings and lets the service worker react immediately. */
 async function persist(patch) {
     settings = await saveSettings(patch);
     try {
         await chrome.runtime.sendMessage({ type: "settingsChanged" });
     } catch {
-        // Service Worker startet gleich von selbst neu.
+        // The service worker will restart on its own shortly.
     }
     flashSaved();
 }
@@ -50,14 +51,30 @@ function status(id, message, isError = false) {
     }, 6000);
 }
 
-/** Lokale Zeit als Wert fuer <input type="datetime-local">. */
+/** Local time as a value for <input type="datetime-local">. */
 function toLocalInput(timestamp) {
     if (!timestamp) return "";
     const d = new Date(timestamp - new Date().getTimezoneOffset() * 60000);
     return d.toISOString().slice(0, 16);
 }
 
-/* ---------------------------------------------------------------- Limits */
+/* -------------------------------------------------------------- Appearance */
+
+function renderTheme() {
+    for (const button of el("themeChoice").querySelectorAll("[data-theme-choice]")) {
+        button.setAttribute("aria-selected", String(button.dataset.themeChoice === settings.theme));
+    }
+}
+
+el("themeChoice").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-theme-choice]");
+    if (!button) return;
+    const theme = button.dataset.themeChoice;
+    applyTheme(theme);
+    persist({ theme }).then(renderTheme);
+});
+
+/* ------------------------------------------------------------------ Limits */
 
 function renderLimits() {
     const body = el("limitRows");
@@ -69,7 +86,7 @@ function renderLimits() {
         const cell = row.insertCell();
         cell.colSpan = 4;
         cell.className = "muted";
-        cell.textContent = "Noch keine Limits gesetzt.";
+        cell.textContent = "No limits set yet.";
         return;
     }
 
@@ -105,7 +122,7 @@ function renderLimits() {
         const remove = document.createElement("button");
         remove.type = "button";
         remove.className = "button tiny ghost";
-        remove.textContent = "Entfernen";
+        remove.textContent = "Remove";
         remove.addEventListener("click", () => {
             const limits = { ...settings.limits };
             delete limits[domain];
@@ -119,7 +136,7 @@ el("addLimit").addEventListener("click", () => {
     const domain = el("newLimitDomain").value.trim().toLowerCase().replace(/^www\./, "");
     const minutes = Number(el("newLimitMinutes").value);
     if (!domain || !minutes || minutes < 1) {
-        status("dataStatus", "Domain und Minuten angeben.", true);
+        status("dataStatus", "Enter a domain and minutes.", true);
         return;
     }
     persist({
@@ -135,7 +152,7 @@ el("addLimit").addEventListener("click", () => {
     });
 });
 
-/* ------------------------------------------------------------- Kategorien */
+/* --------------------------------------------------------------- Categories */
 
 async function renderCategories() {
     const box = el("categoryRows");
@@ -143,11 +160,11 @@ async function renderCategories() {
 
     const usage = await getUsage();
     const byUsage = aggregate(usage).slice(0, CATEGORY_ROW_LIMIT).map(([domain]) => domain);
-    // Zugeordnete Domains immer zeigen, auch wenn sie zuletzt ungenutzt waren.
+    // Always show assigned domains, even if they went unused recently.
     const domains = Array.from(new Set([...Object.keys(settings.categoryOverrides), ...byUsage]));
 
     if (!domains.length) {
-        box.innerHTML = '<p class="muted">Sobald Daten da sind, erscheinen die Domains hier.</p>';
+        box.innerHTML = '<p class="muted">Domains will show up here once there\'s data.</p>';
         return;
     }
 
@@ -183,7 +200,7 @@ function buildCategorySelect(selected) {
     const select = document.createElement("select");
     const auto = document.createElement("option");
     auto.value = "auto";
-    auto.textContent = "automatisch";
+    auto.textContent = "automatic";
     select.appendChild(auto);
 
     for (const key of CATEGORY_KEYS) {
@@ -206,7 +223,7 @@ el("addCategory").addEventListener("click", () => {
     });
 });
 
-/* ---------------------------------------------------------------- Report */
+/* ------------------------------------------------------------------ Report */
 
 async function renderReport() {
     const box = el("reportBox");
@@ -214,13 +231,13 @@ async function renderReport() {
 
     const reports = await getReports();
     if (!reports.length) {
-        box.innerHTML = '<p class="muted">Der erste Report entsteht am kommenden Montag.</p>';
+        box.innerHTML = '<p class="muted">The first report appears next Monday.</p>';
         return;
     }
 
     const report = reports[0];
     const heading = document.createElement("h3");
-    heading.textContent = `Woche ${report.week}`;
+    heading.textContent = `Week ${report.week}`;
 
     const summary = document.createElement("p");
     summary.textContent = reportSummary(report);
@@ -235,17 +252,17 @@ async function renderReport() {
 
     const days = document.createElement("p");
     days.className = "muted";
-    days.textContent = `An ${report.activeDays} von 7 Tagen aktiv.`;
+    days.textContent = `Active on ${report.activeDays} of 7 days.`;
 
     box.append(heading, summary, list, days);
 }
 
-/* ------------------------------------------------------------------ Daten */
+/* -------------------------------------------------------------------- Data */
 
 el("exportCsv").addEventListener("click", async () => {
     const usage = await getUsage();
     download(`websitetimetrack-${new Date().toISOString().slice(0, 10)}.csv`, toCSV(usage), "text/csv");
-    status("dataStatus", "CSV erstellt.");
+    status("dataStatus", "CSV created.");
 });
 
 el("exportJson").addEventListener("click", async () => {
@@ -254,7 +271,7 @@ el("exportJson").addEventListener("click", async () => {
         await toJSON(),
         "application/json",
     );
-    status("dataStatus", "Backup erstellt.");
+    status("dataStatus", "Backup created.");
 });
 
 el("importJson").addEventListener("click", () => el("importFile").click());
@@ -265,7 +282,7 @@ el("importFile").addEventListener("change", async (event) => {
     try {
         const mode = el("importReplace").checked ? "replace" : "merge";
         const { days } = await importJSON(await file.text(), mode);
-        status("dataStatus", `${days} Tage eingelesen.`);
+        status("dataStatus", `Imported ${days} days.`);
         settings = await getSettings();
         renderReport();
         renderCategories();
@@ -278,20 +295,20 @@ el("importFile").addEventListener("change", async (event) => {
 
 el("pushSync").addEventListener("click", async () => {
     if (!settings.syncUsage) {
-        status("syncStatus", "Abgleich ist ausgeschaltet.", true);
+        status("syncStatus", "Sync is turned off.", true);
         return;
     }
     try {
         await sync.push(settings.syncDays);
-        status("syncStatus", "Abgeglichen.");
+        status("syncStatus", "Synced.");
     } catch (error) {
-        status("syncStatus", `Fehlgeschlagen: ${error.message}`, true);
+        status("syncStatus", `Failed: ${error.message}`, true);
     }
 });
 
-/* ------------------------------------------------------------------ Binding */
+/* ---------------------------------------------------------------- Binding */
 
-/** Verbindet ein Eingabefeld mit einem Einstellungsfeld. */
+/** Wires an input to a settings field. */
 function bind(id, key, { type = "value", parse = (v) => v, after } = {}) {
     const node = el(id);
     node.addEventListener("change", async () => {
@@ -319,12 +336,14 @@ function fillForm() {
 
 async function init() {
     settings = await getSettings();
+    applyTheme(settings.theme);
     fillForm();
+    renderTheme();
 
     el("newCategoryValue").replaceWith(
         Object.assign(buildCategorySelect("work"), { id: "newCategoryValue" }),
     );
-    // "automatisch" ergibt beim Neuanlegen keinen Sinn.
+    // "automatic" doesn't make sense when creating a new assignment.
     el("newCategoryValue").querySelector('option[value="auto"]').remove();
 
     bind("idleSeconds", "idleSeconds", { parse: (v) => Math.max(15, Number(v) || 60) });
@@ -347,10 +366,10 @@ async function init() {
         await persist({ syncUsage: enabled });
         try {
             if (enabled) await sync.push(settings.syncDays);
-            else await sync.clearOwn(); // Beim Abschalten den Sync-Speicher freigeben.
-            status("syncStatus", enabled ? "Abgleich aktiv." : "Abgleich aus, Daten entfernt.");
+            else await sync.clearOwn(); // Free the sync storage when turning it off.
+            status("syncStatus", enabled ? "Sync active." : "Sync off, data removed.");
         } catch (error) {
-            status("syncStatus", `Fehlgeschlagen: ${error.message}`, true);
+            status("syncStatus", `Failed: ${error.message}`, true);
         }
     });
 
