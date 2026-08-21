@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WebsiteTimeTrack — Know where your time goes</title>
+<meta name="description" content="A browser extension that measures your time per website. Local only, with daily limits, focus mode, categories and a weekly report.">
+<link rel="icon" href="assets/favicon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="nav">
+    <a class="brand" href="#top">
+        <img src="assets/logo.png" alt="" width="32" height="32">
+        <span>WebsiteTimeTrack</span>
+    </a>
+    <nav>
+        <a href="#features">Features</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/aquaxs1/Time-Tracker">GitHub</a>
+    </nav>
+</header>
+
+<main id="top">
+
+<!-- ------------------------------------------------------------------ Hero -->
+<section class="hero">
+    <div class="hero-text">
+        <h1>Know where your time goes.</h1>
+        <p class="lede">Measures how long you spend on every website — then helps you
+           stop. Daily limits, focus mode and a weekly report. All local.</p>
+        <div class="cta">
+            <a class="btn primary" href="#download">Download</a>
+            <a class="btn" href="#features">View Features</a>
+        </div>
+        <ul class="badges">
+            <li>No account</li>
+            <li>No servers</li>
+            <li>Chrome &amp; Firefox</li>
+        </ul>
+    </div>
+    <div class="hero-shot">
+        <img src="assets/popup-sites.png" alt="The extension popup showing time per website" width="360" height="436">
+    </div>
+</section>
+
+<!-- --------------------------------------------------------------- Screens -->
+<section class="screens">
+    <figure>
+        <img src="assets/popup-detail.png" alt="Popup with a site expanded into channels and repos" width="360" height="503">
+        <figcaption>Channels &amp; repos, not just domains</figcaption>
+    </figure>
+    <figure>
+        <img src="assets/popup-history.png" alt="Popup showing a 30 day history chart" width="360" height="363">
+        <figcaption>30-day history</figcaption>
+    </figure>
+    <figure>
+        <img src="assets/popup-categories.png" alt="Popup showing time split by category" width="360" height="324">
+        <figcaption>Categories &amp; score</figcaption>
+    </figure>
+    <figure>
+        <img src="assets/blocked.png" alt="The block screen shown when a daily limit is reached" width="342" height="252">
+        <figcaption>Block screen when a limit is hit</figcaption>
+    </figure>
+</section>
+
+<!-- -------------------------------------------------------------- Features -->
+<section id="features" class="section">
+    <h2>Features</h2>
+
+    <div class="grid">
+        <article>
+            <h3>Accurate measurement</h3>
+            <ul>
+                <li>Counts only with an active tab, a focused window and a non-idle user</li>
+                <li>Optional: count only on real input — mouse, keyboard, scroll</li>
+                <li>Tabs playing audio still count, so videos aren't read as a pause</li>
+                <li>The idle threshold is subtracted retroactively</li>
+                <li>Sessions crossing midnight are split across both days</li>
+                <li>Sleep and standby never turn into fake hours</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>Beyond domains</h3>
+            <ul>
+                <li>YouTube — time per channel</li>
+                <li>GitHub and GitLab — time per repository</li>
+                <li>Reddit — time per subreddit</li>
+                <li>Twitch and X — time per channel or profile</li>
+                <li>Any domain — first path segment, if you enable it</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>Insight</h3>
+            <ul>
+                <li>Today, 7 days, 30 days, all time</li>
+                <li>Sorted ranking with favicons and category colours</li>
+                <li>30-day history chart</li>
+                <li>Seven categories, ~100 domains pre-assigned</li>
+                <li>Productivity score from 0 to 100</li>
+                <li>Weekly report with a comparison to last week</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>Control</h3>
+            <ul>
+                <li>Daily limit per site, in minutes</li>
+                <li>Warning notification at a threshold you pick</li>
+                <li>Optional blocking with its own block screen</li>
+                <li>Focus mode with an expiry time</li>
+                <li>5-minute snooze when you really need it</li>
+                <li>Ignore list for sites that shouldn't be tracked</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>Your data</h3>
+            <ul>
+                <li>CSV export, one row per day and domain</li>
+                <li>Full JSON backup, including settings</li>
+                <li>Import to merge or replace</li>
+                <li>Delete a single site or everything</li>
+                <li>Optional device sync through your browser profile</li>
+            </ul>
+        </article>
+
+        <article>
+            <h3>Built to last</h3>
+            <ul>
+                <li>Manifest V3, Chrome and Firefox</li>
+                <li>No frameworks, no dependencies, no build step required</li>
+                <li>365 days of history, pruned automatically</li>
+                <li>62 tests, run with <code>npm test</code></li>
+            </ul>
+        </article>
+    </div>
+
+    <figure class="wide">
+        <img src="assets/options.png" alt="The settings page with limits, focus mode and categories" width="760" height="820" loading="lazy">
+        <figcaption>Everything is configurable on the settings page</figcaption>
+    </figure>
+</section>
+
+<!-- --------------------------------------------------------------- Privacy -->
+<section id="privacy" class="section">
+    <h2>Privacy</h2>
+    <p class="lede">Nothing is tracked. Nothing leaves your machine.</p>
+
+    <div class="grid two">
+        <article class="ok">
+            <h3>What the extension does</h3>
+            <ul>
+                <li>Stores times in your browser's local storage</li>
+                <li>Reads the domain of the tab you are looking at</li>
+                <li>Runs entirely offline — it makes no network requests at all</li>
+            </ul>
+        </article>
+        <article class="no">
+            <h3>What it never does</h3>
+            <ul>
+                <li>No account, no login, no server</li>
+                <li>No analytics, no telemetry, no ads</li>
+                <li>No page content, no form data, no passwords</li>
+                <li>No external scripts or fonts</li>
+            </ul>
+        </article>
+    </div>
+
+    <h3 class="sub">Why each permission is needed</h3>
+    <table class="perms">
+        <tr><td><code>tabs</code></td><td>Read the domain of the active tab</td></tr>
+        <tr><td><code>storage</code></td><td>Save your times and settings locally</td></tr>
+        <tr><td><code>idle</code></td><td>Stop counting when you step away</td></tr>
+        <tr><td><code>alarms</code></td><td>Write pending time down once a minute</td></tr>
+        <tr><td><code>notifications</code></td><td>Limit warnings and the weekly report</td></tr>
+        <tr><td><code>favicon</code></td><td>Show site icons from the browser's own cache</td></tr>
+        <tr><td>content script</td><td>Detect real input and read the YouTube channel name</td></tr>
+    </table>
+
+    <p class="note">Device sync is off by default. Turned on, it uses your browser's
+       own sync storage — the same channel as your bookmarks, not a server of ours.</p>
+</section>
+
+<!-- -------------------------------------------------------------- Download -->
+<section id="download" class="section">
+    <h2>Download &amp; install</h2>
+
+    <div class="cta">
+        <a class="btn primary" href="https://github.com/aquaxs1/Time-Tracker/archive/refs/heads/main.zip">Download ZIP</a>
+        <a class="btn" href="https://github.com/aquaxs1/Time-Tracker">View source</a>
+    </div>
+
+    <div class="grid two">
+        <article>
+            <h3>Chrome, Edge, Brave</h3>
+            <ol>
+                <li>Unpack the ZIP</li>
+                <li>Open <code>chrome://extensions</code></li>
+                <li>Turn on <strong>Developer mode</strong></li>
+                <li>Click <strong>Load unpacked</strong></li>
+                <li>Pick the <code>WebsiteTimeTrack</code> folder</li>
+            </ol>
+        </article>
+        <article>
+            <h3>Firefox</h3>
+            <ol>
+                <li>Run <code>npm run build</code> in the repo</li>
+                <li>Open <code>about:debugging</code></li>
+                <li>Go to <strong>This Firefox</strong></li>
+                <li>Click <strong>Load Temporary Add-on</strong></li>
+                <li>Pick <code>dist/firefox/manifest.json</code></li>
+            </ol>
+        </article>
+    </div>
+
+    <h3 class="sub">First five minutes</h3>
+    <div class="grid steps">
+        <article><span class="step">1</span>
+            <h4>Pin it</h4>
+            <p>Click the puzzle icon in the toolbar and pin WebsiteTimeTrack so the
+               popup is one click away.</p></article>
+        <article><span class="step">2</span>
+            <h4>Just browse</h4>
+            <p>Tracking starts immediately. Come back in an hour and the ranking
+               will have filled itself in.</p></article>
+        <article><span class="step">3</span>
+            <h4>Set a limit</h4>
+            <p>Open <em>Settings</em>, add a daily limit for the site at the top of
+               your list, and tick <em>block</em> if you mean it.</p></article>
+        <article><span class="step">4</span>
+            <h4>Use focus mode</h4>
+            <p>The <em>Focus</em> button in the popup blocks social and entertainment
+               sites for an hour.</p></article>
+    </div>
+</section>
+
+</main>
+
+<!-- ---------------------------------------------------------------- Footer -->
+<footer>
+    <div class="foot-inner">
+        <a class="brand" href="#top">
+            <img src="assets/logo.png" alt="" width="24" height="24">
+            <span>WebsiteTimeTrack</span>
+        </a>
+        <nav class="foot-links">
+            <a href="#features">Features</a>
+            <a href="#privacy">Privacy</a>
+            <a href="#download">Download</a>
+            <a href="#download">Tutorial</a>
+            <a href="terms.html">Terms of Use</a>
+            <a href="https://github.com/aquaxs1/Time-Tracker">GitHub</a>
+        </nav>
+        <p class="copy">© 2026 aquaxs1</p>
+    </div>
+</footer>
+
+</body>
+</html>

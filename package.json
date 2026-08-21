@@ -5,6 +5,10 @@
   "description": "Eigene Projekte, gesammelt aus OneDrive",
   "scripts": {
     "test": "node --test WebsiteTimeTrack/test/unit.test.mjs WebsiteTimeTrack/test/background.test.mjs WebsiteTimeTrack/test/pages.test.mjs",
-    "build": "bash WebsiteTimeTrack/build.sh"
+    "build": "bash WebsiteTimeTrack/build.sh",
+    "screenshots": "node tools/screenshots.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.62.1"
   }
 }

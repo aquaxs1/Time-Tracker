@@ -5,6 +5,7 @@ Sammlung eigener Projekte, die bisher nur lokal in OneDrive lagen.
 | Projekt | Beschreibung |
 | --- | --- |
 | [`WebsiteTimeTrack/`](WebsiteTimeTrack/) | Browser-Extension (Manifest V3, Chrome + Firefox), die misst, wie lange man auf welcher Website ist |
+| [`site/`](site/) | Statische Landingpage der Extension (englisch) |
 
 ---
 
@@ -132,6 +133,39 @@ WebsiteTimeTrack/
     sync.js         Geraeteabgleich
   test/                   62 Tests
 ```
+
+---
+
+## site
+
+Statische Landingpage, englisch, ohne Abhaengigkeiten – einfach
+`site/index.html` oeffnen oder den Ordner irgendwo statisch ausliefern
+(GitHub Pages, Netlify, jeder Webserver).
+
+```
+site/
+  index.html    Hero, Features, Privacy, Download + Anleitung, Footer
+  terms.html    Terms of Use
+  styles.css
+  assets/       Logo, Favicon, Screenshots
+```
+
+Die Screenshots sind keine Mockups, sondern aus der echten Extension
+gerendert: `tools/screenshots.mjs` startet die Seiten der Extension in
+Chromium, ersetzt die `chrome.*`-APIs durch Beispieldaten und fotografiert
+das Ergebnis.
+
+```bash
+npm run screenshots     # braucht playwright (devDependency)
+```
+
+Aendert sich die Oberflaeche der Extension, erzeugt derselbe Befehl die
+Bilder neu – die Website kann also nicht veralten.
+
+**Hinweis:** Die Oberflaeche der Extension ist deutsch, die Website englisch.
+Die Screenshots zeigen daher deutsche Beschriftungen.
+
+---
 
 ### Versionsgeschichte
 
