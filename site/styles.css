@@ -83,7 +83,7 @@ h3 { font-size: 17px; }
     grid-template-columns: 1fr auto;
     gap: 56px;
     align-items: center;
-    /* Der blaue Schein des Logos laeuft hinter dem Hero weiter. */
+    /* The blue glow of the logo continues behind the hero. */
     background: radial-gradient(ellipse 900px 460px at 60% 30%,
                 rgba(47, 143, 255, 0.16), transparent 70%);
 }
@@ -210,12 +210,15 @@ figcaption { color: var(--muted); font-size: 14px; margin-top: 10px; }
     font-weight: 700;
 }
 
-/* Berechtigungen */
+/* Permissions */
 .perms { width: 100%; border-collapse: collapse; }
 .perms td { padding: 9px 4px; border-bottom: 1px solid var(--line); color: var(--muted); vertical-align: top; }
 .perms td:first-child { width: 190px; color: var(--fg); }
 
 .note { color: var(--muted); font-size: 15px; margin-top: 24px; }
+
+/* Prerequisite line above an install step list */
+.req { color: var(--muted); font-size: 15px; margin: 0 0 14px; }
 
 /* ------------------------------------------------------------------ Footer */
 

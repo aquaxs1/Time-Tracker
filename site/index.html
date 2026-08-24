@@ -133,7 +133,7 @@
             <h3>Built to last</h3>
             <ul>
                 <li>Manifest V3, Chrome and Firefox</li>
-                <li>No frameworks, no dependencies, no build step required</li>
+                <li>No frameworks and no runtime dependencies — Chrome needs no build step</li>
                 <li>365 days of history, pruned automatically</li>
                 <li>62 tests, run with <code>npm test</code></li>
             </ul>
@@ -208,6 +208,8 @@
         </article>
         <article>
             <h3>Firefox</h3>
+            <p class="req">Needs <a href="https://nodejs.org/">Node.js</a> 18+ and npm — the Firefox
+               build is generated, not shipped.</p>
             <ol>
                 <li>Run <code>npm run build</code> in the repo</li>
                 <li>Open <code>about:debugging</code></li>
@@ -218,7 +220,7 @@
         </article>
     </div>
 
-    <h3 class="sub">First five minutes</h3>
+    <h3 class="sub" id="first-run">First five minutes</h3>
     <div class="grid steps">
         <article><span class="step">1</span>
             <h4>Pin it</h4>
@@ -252,7 +254,7 @@
             <a href="#features">Features</a>
             <a href="#privacy">Privacy</a>
             <a href="#download">Download</a>
-            <a href="#download">Tutorial</a>
+            <a href="#first-run">Getting started</a>
             <a href="terms.html">Terms of Use</a>
             <a href="https://github.com/aquaxs1/Time-Tracker">GitHub</a>
         </nav>
