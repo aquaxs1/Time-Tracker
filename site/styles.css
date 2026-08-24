@@ -193,7 +193,7 @@ figcaption { color: var(--muted); font-size: 14px; margin-top: 10px; }
 .grid article.no { border-color: rgba(217, 83, 79, 0.3); }
 .grid article.no li::marker { color: var(--no); }
 
-/* Schritte – vier Karten sollen in eine Reihe passen. */
+/* Steps — the four cards should fit on one row. */
 .grid.steps { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
 .grid.steps article { position: relative; padding-top: 22px; }
 .grid.steps h4 { margin: 10px 0 6px; font-size: 16px; }
@@ -238,7 +238,7 @@ footer { border-top: 1px solid var(--line); background: var(--panel); }
 .foot-links a:hover { color: var(--fg); text-decoration: none; }
 .copy { color: var(--muted); font-size: 14px; margin: 0; }
 
-/* -------------------------------------------------------------------- Prosa */
+/* -------------------------------------------------------------------- Prose */
 
 .prose { max-width: 720px; margin: 0 auto; padding: 56px 24px 72px; }
 .prose h1 { font-size: 32px; margin-bottom: 8px; }
@@ -269,3 +269,27 @@ footer { border-top: 1px solid var(--line); background: var(--panel); }
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
 }
+
+
+/* ----------------------------------------------------------------- 404 page */
+.nf-wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+.nf-inner { max-width: 46ch; }
+.nf-inner img { width: 76px; height: auto; margin: 0 auto 26px; }
+.nf-code {
+  font-size: clamp(4.5rem, 17vw, 8.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  margin: 0;
+  opacity: 0.13;
+}
+.nf-inner h1 { font-size: clamp(1.5rem, 4.5vw, 2.1rem); margin: -0.3em 0 0.6rem; }
+.nf-inner p { margin: 0 0 1.9rem; opacity: 0.75; }
