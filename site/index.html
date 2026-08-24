@@ -141,9 +141,9 @@
             <h3>Built to last</h3>
             <ul>
                 <li>Manifest V3, Chrome and Firefox</li>
-                <li>No frameworks and no runtime dependencies — Chrome needs no build step</li>
+                <li>No frameworks and no runtime dependencies</li>
                 <li>365 days of history, pruned automatically</li>
-                <li>62 tests, run with <code>npm test</code></li>
+                <li>65 tests, run with <code>npm test</code></li>
             </ul>
         </article>
     </div>
@@ -199,9 +199,12 @@
     <h2>Download &amp; install</h2>
 
     <div class="cta">
-        <a class="btn primary" href="https://github.com/aquaxs1/Time-Tracker/archive/refs/heads/main.zip">Download ZIP</a>
+        <a class="btn primary" href="https://github.com/aquaxs1/Time-Tracker/releases/latest/download/websitetimetrack-chrome.zip">Download for Chrome</a>
+        <a class="btn primary" href="https://github.com/aquaxs1/Time-Tracker/releases/latest/download/websitetimetrack-firefox.zip">Download for Firefox</a>
         <a class="btn" href="https://github.com/aquaxs1/Time-Tracker">View source</a>
     </div>
+    <p class="req">Ready to load — nothing to compile. Not in the stores, so the browser
+       asks you to load it by hand once.</p>
 
     <div class="grid two">
         <article>
@@ -211,19 +214,18 @@
                 <li>Open <code>chrome://extensions</code></li>
                 <li>Turn on <strong>Developer mode</strong></li>
                 <li>Click <strong>Load unpacked</strong></li>
-                <li>Pick the <code>WebsiteTimeTrack</code> folder</li>
+                <li>Pick the <code>chrome</code> folder</li>
             </ol>
         </article>
         <article>
             <h3>Firefox</h3>
-            <p class="req">Needs <a href="https://nodejs.org/">Node.js</a> 18+ and npm — the Firefox
-               build is generated, not shipped.</p>
             <ol>
-                <li>Run <code>npm run build</code> in the repo</li>
+                <li>Unpack the ZIP</li>
                 <li>Open <code>about:debugging</code></li>
                 <li>Go to <strong>This Firefox</strong></li>
                 <li>Click <strong>Load Temporary Add-on</strong></li>
-                <li>Pick <code>dist/firefox/manifest.json</code></li>
+                <li>Pick <code>firefox/manifest.json</code></li>
+                <li>Firefox forgets it on restart — load it again</li>
             </ol>
         </article>
     </div>

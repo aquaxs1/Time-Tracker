@@ -1,0 +1,95 @@
+name: Build & release extension
+
+# Packages the extension into one ready-to-load ZIP per browser and publishes
+# them to a GitHub Release.
+#
+# There is no store listing, so the ZIP is the distribution channel. Each
+# archive contains the extension folder itself -- unpack and point the
+# browser at it, no build step and no Node installation on the user's side.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v2.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # The suite runs on the source, not the build output, so a broken
+      # extension never reaches a release.
+      - name: Test
+        run: npm test
+
+      - name: Build both targets
+        run: npm run build
+
+      # The tag is the single source of truth for the version. A manifest
+      # that disagrees with it would ship an extension the browser reports
+      # under a different number than the release it came from.
+      - name: Check the manifests match the tag
+        run: |
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          WANT="${TAG#v}"
+          for f in WebsiteTimeTrack/dist/chrome/manifest.json WebsiteTimeTrack/dist/firefox/manifest.json; do
+            GOT=$(node -p "require('./$f').version")
+            if [ "$GOT" != "$WANT" ]; then
+              echo "::error::$f says $GOT but the tag says $WANT"
+              exit 1
+            fi
+          done
+          echo "both manifests report $WANT"
+
+      - name: Package
+        run: |
+          cd WebsiteTimeTrack/dist
+          zip -r ../../websitetimetrack-chrome.zip chrome
+          zip -r ../../websitetimetrack-firefox.zip firefox
+
+      - name: Checksums
+        run: sha256sum websitetimetrack-*.zip > SHA256SUMS.txt
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          name: WebsiteTimeTrack ${{ github.event.inputs.tag || github.ref_name }}
+          generate_release_notes: true
+          files: |
+            websitetimetrack-chrome.zip
+            websitetimetrack-firefox.zip
+            SHA256SUMS.txt
+          body: |
+            Ready-to-load builds of WebsiteTimeTrack. Nothing to compile.
+
+            **Chrome, Edge, Brave** — unpack `websitetimetrack-chrome.zip`,
+            open `chrome://extensions`, turn on Developer mode, click
+            *Load unpacked* and pick the `chrome` folder.
+
+            **Firefox** — unpack `websitetimetrack-firefox.zip`, open
+            `about:debugging`, go to *This Firefox*, click
+            *Load Temporary Add-on* and pick `firefox/manifest.json`.
+            Firefox drops temporary add-ons when it closes; load it again
+            after a restart.
+
+            The extension makes no network requests and stores everything in
+            your own browser.
+
+            Verify a download against `SHA256SUMS.txt`:
+
+            ```
+            sha256sum -c SHA256SUMS.txt
+            ```
