@@ -1,215 +1,232 @@
-# Time-Tracker
+<div align="center">
 
-Sammlung eigener Projekte, die bisher nur lokal in OneDrive lagen.
+<img src="site/assets/logo.png" width="96" alt="WebsiteTimeTrack">
 
-| Projekt | Beschreibung |
-| --- | --- |
-| [`WebsiteTimeTrack/`](WebsiteTimeTrack/) | Browser-Extension (Manifest V3, Chrome + Firefox), die misst, wie lange man auf welcher Website ist |
-| [`site/`](site/) | Statische Landingpage der Extension (englisch) |
+# WebsiteTimeTrack
+
+**Know where your time goes.**
+
+A browser extension that measures how long you spend on every website — then
+helps you stop. Daily limits, focus mode, categories and a weekly report.
+Everything stays on your machine.
+
+[![Website](https://img.shields.io/badge/website-timetrackerextension.vercel.app-2f8fff)](https://timetrackerextension.vercel.app)
+[![Download](https://img.shields.io/badge/download-Chrome%20%7C%20Firefox-27ae60)](https://github.com/aquaxs1/Time-Tracker/releases/latest)
+[![Manifest](https://img.shields.io/badge/manifest-V3-5f6caf)](WebsiteTimeTrack/manifest.json)
+[![Tests](https://img.shields.io/badge/tests-65%20passing-3fa96b)](WebsiteTimeTrack/test)
+[![Dependencies](https://img.shields.io/badge/runtime%20deps-none-lightgrey)](package.json)
+
+</div>
 
 ---
 
-## WebsiteTimeTrack
+## Install
 
-Misst lokal die Zeit je Website – mit Tageslimits, Fokusmodus, Kategorien,
-Produktivitaets-Score, Wochenreport und Export. Keine Server, keine externen
-Bibliotheken, keine Netzwerkzugriffe. Oberflaeche komplett auf Englisch,
-mit Hell-/Dunkelmodus.
+Grab a ready-to-load ZIP — nothing to compile:
 
-### Installation
+| Browser | Download | Then |
+|---|---|---|
+| **Chrome, Edge, Brave** | [`websitetimetrack-chrome.zip`](https://github.com/aquaxs1/Time-Tracker/releases/latest/download/websitetimetrack-chrome.zip) | `chrome://extensions` → Developer mode → *Load unpacked* → the `chrome` folder |
+| **Firefox** | [`websitetimetrack-firefox.zip`](https://github.com/aquaxs1/Time-Tracker/releases/latest/download/websitetimetrack-firefox.zip) | `about:debugging` → *This Firefox* → *Load Temporary Add-on* → `firefox/manifest.json` |
 
-```bash
-npm run build     # erzeugt dist/chrome und dist/firefox
-```
+Firefox drops temporary add-ons when it closes — load it again after a restart.
 
-* **Chrome:** `chrome://extensions` → Entwicklermodus → *Entpackte Erweiterung laden* → `WebsiteTimeTrack/dist/chrome`
-* **Firefox:** `about:debugging` → *Dieser Firefox* → *Temporaeres Add-on laden* → `WebsiteTimeTrack/dist/firefox/manifest.json`
-
-Ohne Build laesst sich der Ordner `WebsiteTimeTrack/` in Chrome direkt laden.
+<details>
+<summary>Building from source</summary>
 
 ```bash
-npm test          # 65 Tests, keine Abhaengigkeiten
+npm run build     # writes dist/chrome and dist/firefox
+npm test          # 65 tests, no dependencies
 ```
 
-### Was die Extension kann
+The unbuilt `WebsiteTimeTrack/` folder also loads directly in Chrome.
+</details>
 
-**Messung**
+---
 
-| | |
-| --- | --- |
-| Zeit je Domain | Tagesgenau gespeichert, 365 Tage Historie |
-| Echte Aktivitaet | Zaehlt nur bei aktivem Tab, fokussiertem Fenster und nicht-idlem Nutzer |
-| Interaktionspflicht | Optional: nur zaehlen bei Maus, Tastatur oder Scrollen |
-| Ton-Ausnahme | Tabs mit Ton zaehlen trotzdem, damit Videos nicht als Pause gelten |
-| Idle-Korrektur | Die Idle-Schwelle wird rueckwirkend abgezogen, nicht mitgezaehlt |
-| Mitternacht | Segmente ueber 0 Uhr werden auf beide Tage aufgeteilt |
-| Standby-Schutz | Segmente ueber 5 Minuten gelten als Ruhezustand und werden verworfen |
-| Ignorierliste | Domains, die gar nicht erst erfasst werden (inkl. Subdomains) |
+## What it does
 
-**Unterobjekte statt nur Domains**
+### Measurement
 
 | | |
 | --- | --- |
-| YouTube | Zeit je Kanal (Kanalname kommt vom Content-Script) |
-| GitHub / GitLab | Zeit je Repository |
-| Reddit | Zeit je Subreddit |
-| Twitch, X | Zeit je Kanal bzw. Profil |
-| Beliebige Domains | Erstes Pfadsegment als Bereich, per Einstellung |
+| Time per domain | Stored per day, 365 days of history |
+| Real activity only | Counts with an active tab, a focused window and a non-idle user |
+| Interaction requirement | Optional: only count on mouse, keyboard or scroll |
+| Audio exception | Tabs playing sound still count, so videos aren't read as a pause |
+| Idle correction | The idle threshold is subtracted retroactively rather than counted |
+| Midnight | Segments crossing 00:00 are split across both days |
+| Standby protection | Segments over 5 minutes are treated as sleep and discarded |
+| Ignore list | Domains that are never recorded at all, subdomains included |
 
-**Auswertung im Popup**
-
-| | |
-| --- | --- |
-| Zeitraeume | Heute, 7 Tage, 30 Tage, Gesamt |
-| Rangliste | Sortiert, mit Favicon, Balken in Kategoriefarbe |
-| Aufklappen | Klick auf eine Domain zeigt ihre Unterobjekte |
-| Verlauf | Balkendiagramm der letzten 30 Tage |
-| Kategorien | Anteil je Kategorie mit Prozent und Zeit |
-| Produktivitaets-Score | 0–100, gewichtet nach Kategorie |
-| Einzeln loeschen | Domain aus allen Tagen entfernen, zweistufig bestaetigt |
-| Live | Aktualisiert sich sekuendlich, solange das Popup offen ist |
-| Darkmode | Auto/Light/Dark umschaltbar, Toggle im Popup und auf der Optionsseite |
-
-**Limits, Sperre, Fokus**
+### Beyond domains
 
 | | |
 | --- | --- |
-| Tageslimit je Domain | In Minuten, Subdomains eingeschlossen |
-| Vorwarnung | Benachrichtigung bei frei waehlbarem Prozentsatz (Standard 80 %) |
-| Sperre | Optional beim Erreichen des Limits, mit eigener Sperrseite |
-| Fokusmodus | Sperrt Ablenkung auf Knopfdruck, mit Ablaufzeit |
-| Fokus-Standard | Ohne eigene Liste greifen die Kategorien Social und Unterhaltung |
-| Snooze | 5 Minuten Ausnahme direkt von der Sperrseite |
+| YouTube | Time per channel — the name comes from the content script |
+| GitHub / GitLab | Time per repository |
+| Reddit | Time per subreddit |
+| Twitch, X | Time per channel or profile |
+| Any domain | First path segment as a section, if you enable it |
 
-**Kategorien und Score**
-
-| | |
-| --- | --- |
-| Sieben Kategorien | Work, Learning, News, Shopping, Social, Entertainment, Other |
-| Vorbelegung | Rund 100 bekannte Domains sind zugeordnet |
-| Eigene Zuordnung | Pro Domain aenderbar, wirkt auch auf Subdomains |
-| Score | 50 ist neutral, Arbeit und Lernen heben ihn, Social und Unterhaltung senken ihn |
-
-**Report, Export, Sync**
+### Insight, in the popup
 
 | | |
 | --- | --- |
-| Wochenreport | Montags automatisch: Summe, Top-Seiten, Kategorien, Score, Vergleich zur Vorwoche |
-| CSV-Export | Eine Zeile je Tag und Domain, direkt pivotierbar |
-| JSON-Backup | Vollstaendig, inklusive Unterobjekten und Einstellungen |
-| Import | Zusammenfuehren oder ersetzen |
-| Einstellungs-Sync | Ueber das Browserprofil, ohne Zutun |
-| Daten-Sync | Optional, letzte N Tage, je Geraet ein eigener Bereich (konfliktfrei) |
+| Ranges | Today, 7 days, 30 days, all time |
+| Ranking | Sorted, with favicons and bars in the category colour |
+| Expand | Click a domain to see its sub-entries |
+| History | Bar chart of the last 30 days |
+| Categories | Share per category, with percentage and time |
+| Productivity score | 0–100, weighted by category |
+| Delete one site | Removes a domain from every day, with a two-step confirm |
+| Live | Refreshes every second while the popup is open |
+| Dark mode | Auto / Light / Dark, in the popup and on the settings page |
 
-**Technik**
+### Limits, blocking, focus
 
 | | |
 | --- | --- |
-| Speicher | Alles lokal; `storage.local` fuer Daten, `storage.sync` fuer Einstellungen |
-| Berechtigungen | `tabs`, `storage`, `idle`, `alarms`, `notifications`, `favicon` |
-| Aufbewahrung | 365 Tage Domaindaten, 60 Tage Unterobjekte, automatisch bereinigt |
-| Migration | Daten aus 1.0 und 1.1 werden beim Update uebernommen |
-| Firefox | Eigenes Manifest, sonst identischer Code |
-| Tests | 65 Tests ohne Abhaengigkeiten (`npm test`) |
+| Daily limit per domain | In minutes, subdomains included |
+| Early warning | Notification at a percentage you pick, 80 % by default |
+| Blocking | Optional when the limit is reached, with its own block screen |
+| Focus mode | Blocks distraction on demand, with an expiry time |
+| Focus default | Without a list of your own, Social and Entertainment apply |
+| Snooze | A 5-minute exception straight from the block screen |
 
-### Aufbau
+### Categories and score
+
+| | |
+| --- | --- |
+| Seven categories | Work, Learning, News, Shopping, Social, Entertainment, Other |
+| Preassigned | Around 100 well-known domains are already categorised |
+| Your own mapping | Changeable per domain, and it applies to subdomains too |
+| Score | 50 is neutral; work and learning raise it, social and entertainment lower it |
+
+### Report, export, sync
+
+| | |
+| --- | --- |
+| Weekly report | Automatic on Mondays: total, top sites, categories, score, comparison to last week |
+| CSV export | One row per day and domain, ready to pivot |
+| JSON backup | Complete, including sub-entries and settings |
+| Import | Merge or replace |
+| Settings sync | Through your browser profile, with nothing to set up |
+| Data sync | Optional, last N days, one area per device so it cannot conflict |
+
+### Under the hood
+
+| | |
+| --- | --- |
+| Storage | All local — `storage.local` for data, `storage.sync` for settings |
+| Permissions | `tabs`, `storage`, `idle`, `alarms`, `notifications`, `favicon` |
+| Retention | 365 days of domain data, 60 days of sub-entries, pruned automatically |
+| Migration | Data from 1.0 and 1.1 is carried over on update |
+| Firefox | Its own manifest, otherwise identical code |
+| Tests | 65 tests with no dependencies (`npm test`) |
+
+---
+
+## Privacy
+
+The extension makes **no network requests at all**. There is no account, no
+server, no analytics and no telemetry. It reads the domain of the tab you are
+looking at and writes times into your own browser storage — nothing else, and
+nothing leaves your machine.
+
+---
+
+## Layout
 
 ```
 WebsiteTimeTrack/
-  manifest.json           Chrome (MV3, Service Worker)
-  manifest.firefox.json   Firefox (MV3, Event Page)
-  background.js           Segmentmessung, Limits, Sperre, Wartung
-  content.js              Interaktionsmeldung + YouTube-Kanal
-  popup.*                 Rangliste, Verlauf, Kategorien
-  options.*               Einstellungen, Kategorien, Report, Export
-  blocked.*               Sperrseite mit Snooze
+  manifest.json           Chrome (MV3, service worker)
+  manifest.firefox.json   Firefox (MV3, event page)
+  background.js           Segment measurement, limits, blocking, maintenance
+  content.js              Interaction reporting + YouTube channel
+  popup.*                 Ranking, history, categories
+  options.*               Settings, categories, report, export
+  blocked.*               Block screen with snooze
   lib/
-    time.js         Tages- und Wochenschluessel, Formatierung
-    entity.js       Domain- und Unterobjekt-Erkennung, Musterabgleich
-    categories.js   Kategorien, Standardzuordnung, Score
-    settings.js     Defaults, Lesen/Schreiben in storage.sync
-    storage.js      Schema, Aggregation, Migration, Aufbewahrung
-    limits.js       Limits, Benachrichtigungen, Sperrgruende
-    report.js       Wochenreport
-    export.js       CSV, JSON, Import
-    sync.js         Geraeteabgleich
-  test/                   65 Tests
+    time.js         Day and week keys, formatting
+    entity.js       Domain and sub-entry detection, pattern matching
+    categories.js   Categories, default mapping, score
+    settings.js     Defaults, reading and writing storage.sync
+    storage.js      Schema, aggregation, migration, retention
+    limits.js       Limits, notifications, block reasons
+    report.js       Weekly report
+    export.js       CSV, JSON, import
+    sync.js         Device reconciliation
+  test/                   65 tests
+site/                     Static landing page
 ```
 
----
+### Screenshots are generated, not mocked
 
-## site
-
-Statische Landingpage, englisch, ohne Abhaengigkeiten – einfach
-`site/index.html` oeffnen oder den Ordner irgendwo statisch ausliefern
-(GitHub Pages, Netlify, jeder Webserver).
-
-```
-site/
-  index.html    Hero, Features, Privacy, Download + Anleitung, Footer
-  terms.html    Terms of Use
-  styles.css
-  assets/       Logo, Favicon, Screenshots
-```
-
-Die Screenshots sind keine Mockups, sondern aus der echten Extension
-gerendert: `tools/screenshots.mjs` startet die Seiten der Extension in
-Chromium, ersetzt die `chrome.*`-APIs durch Beispieldaten und fotografiert
-das Ergebnis.
+`tools/screenshots.mjs` opens the extension's real pages in Chromium, replaces
+the `chrome.*` APIs with sample data and photographs the result:
 
 ```bash
-npm run screenshots     # braucht playwright (devDependency)
+npm run screenshots     # needs playwright (devDependency)
 ```
 
-Aendert sich die Oberflaeche der Extension, erzeugt derselbe Befehl die
-Bilder neu – die Website kann also nicht veralten. Die Screenshots werden
-mit erzwungenem Dark Mode aufgenommen (`theme: "dark"` im Stub), unabhaengig
-vom Systemthema der Maschine, die sie erzeugt.
+Change the interface and the same command regenerates the images, so the
+website cannot go stale. They are captured with dark mode forced
+(`theme: "dark"` in the stub), independent of the host machine's theme.
 
 ---
 
-### Versionsgeschichte
+## Version history
 
-**2.1.0** – Neues Logo (Extension-Icons, Website, Favicon). Komplette
-Oberflaeche auf Englisch uebersetzt (Popup, Optionsseite, Sperrseite,
-Benachrichtigungen, CSV-Export) – vorher war nur die Website englisch, die
-Extension selbst deutsch. Dazu ein echter Darkmode: Umschalter Auto/Light/Dark
-im Popup und auf der Optionsseite, gespeichert in `chrome.storage.sync` und
-zusaetzlich in `localStorage` gecacht, damit die Seite schon vor dem ersten
-Rendern im richtigen Thema startet statt kurz hell aufzublitzen. Die
-Website-Screenshots sind neu im Dark Mode aufgenommen.
+**2.1.0** — New logo across the extension icons, website and favicon. The
+whole interface translated to English — popup, settings page, block screen,
+notifications, CSV export; before this only the website was English while the
+extension itself was German. Plus real dark mode: an Auto/Light/Dark toggle in
+the popup and on the settings page, stored in `chrome.storage.sync` and cached
+in `localStorage` so the page starts in the right theme instead of flashing
+light first. Website screenshots retaken in dark mode.
 
-**2.0.0** – Limits mit Benachrichtigung, Sperre und Fokusmodus, 30-Tage-Verlauf,
-Kategorien mit Produktivitaets-Score, Favicons, einzelne Domains loeschen,
-Ignorierliste, Optionsseite, CSV/JSON-Export mit Import, Wochenreport,
-Geraeteabgleich, Unterobjekte (YouTube-Kanal, GitHub-Repo, Subreddit),
-Firefox-Port, Interaktionserkennung per Content-Script.
+**2.0.0** — Limits with notifications, blocking and focus mode; 30-day history;
+categories with a productivity score; favicons; deleting individual domains; an
+ignore list; a settings page; CSV/JSON export with import; the weekly report;
+device reconciliation; sub-entries (YouTube channel, GitHub repo, subreddit); the
+Firefox port; interaction detection via a content script.
 
-Dabei zusaetzlich korrigiert: Beim Wechsel in den Idle-Zustand wurde die volle
-Zeit bis zum naechsten Alarm gebucht, obwohl Chrome den Zustand erst nach
-Ablauf der Schwelle meldet. Die Schwelle wird jetzt abgezogen; bei aktivierter
-Interaktionspflicht endet ein Segment am Ende des Interaktionsfensters.
+Fixed along the way: switching to idle booked the full time until the next
+alarm even though Chrome only reports the state after the threshold elapses.
+The threshold is now subtracted, and with the interaction requirement on, a
+segment ends at the end of the interaction window.
 
-**1.1.0** – Fehlerbehebungen an der Erstfassung:
+**1.1.0** — Bug fixes to the first release.
 
-*Kritisch:* `setInterval` im Service Worker (MV3 beendet ihn, der Timer stirbt
-mit) · Zustand nur im Modul-Scope · nach einer Idle-Phase zaehlte nichts mehr ·
-vor dem ersten Tabwechsel zaehlte nichts · Fensterfokus wurde ignoriert ·
-Chart.js vom CDN wurde von der MV3-CSP blockiert, das Diagramm erschien nie.
+*Critical:* `setInterval` in the service worker (MV3 terminates it and the
+timer dies with it) · state held only in module scope · nothing counted after
+an idle period · nothing counted before the first tab switch · window focus was
+ignored · Chart.js from a CDN was blocked by the MV3 CSP, so the chart never
+appeared.
 
-*Robustheit:* Abstuerze bei geschlossenen Tabs und Tabs ohne URL ·
-systematische Unterzaehlung durch Sekundenrundung · Race Condition beim
-Schreiben · Standby wurde als Nutzung gebucht · flaches Storage-Schema ·
-`setDetectionInterval` nie gesetzt.
+*Robustness:* crashes on closed tabs and tabs without a URL · systematic
+undercounting from second-rounding · a write race condition · standby booked as
+usage · a flat storage schema · `setDetectionInterval` never set.
 
-*Popup:* unsortiert · kein Auto-Refresh · Reset ohne Rueckfrage · `formatTime`
-gab immer `0h 0m 42s` aus.
+*Popup:* unsorted · no auto-refresh · reset without confirmation · `formatTime`
+always printed `0h 0m 42s`.
 
-**1.0** – Ursprungsfassung aus OneDrive.
+**1.0** — The original version.
 
-### Hinweis zum Signierschluessel
+---
 
-Das urspruengliche Archiv enthielt `WebsiteTimeTrack.pem`, den privaten
-Signierschluessel der Extension. Er ist bewusst nicht eingecheckt – wer ihn
-hat, kann Updates unter derselben Extension-ID veroeffentlichen. `.gitignore`
-blockt `*.pem` und `*.crx`; die Datei gehoert ausserhalb des Repos aufbewahrt.
+## A note on the signing key
+
+The original archive contained `WebsiteTimeTrack.pem`, the extension's private
+signing key. It is deliberately not committed — whoever holds it can publish
+updates under the same extension ID. `.gitignore` blocks `*.pem` and `*.crx`;
+keep the file outside the repository.
+
+---
+
+## Links
+
+- **Website** — <https://timetrackerextension.vercel.app>
+- **Terms of Use** — <https://timetrackerextension.vercel.app/terms.html>
+- **Releases** — <https://github.com/aquaxs1/Time-Tracker/releases>
