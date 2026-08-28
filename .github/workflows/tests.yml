@@ -1,0 +1,51 @@
+name: Tests
+
+# The suite drives the extension's modules against a mock chrome.* API
+# (test/mock-chrome.mjs), so it needs no browser and no install step --
+# playwright is a devDependency for the screenshot tool only.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Node ${{ matrix.node-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # node --test with the runner used here needs 20+; 22 is current LTS.
+        node-version: ["20", "22"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # No `npm ci`: the tests import nothing outside node: builtins and the
+      # extension's own files, so installing playwright would only cost time.
+      - name: Run the test suite
+        run: npm test
+
+  manifest:
+    name: Validate manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # A malformed manifest.json makes the extension silently unloadable,
+      # which no unit test would catch.
+      - name: Parse manifest.json
+        run: node -e "const m=require('./WebsiteTimeTrack/manifest.json'); if(m.manifest_version!==3) throw new Error('expected manifest_version 3'); console.log('manifest v'+m.manifest_version+', extension v'+m.version)"
