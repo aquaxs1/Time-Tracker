@@ -1,6 +1,7 @@
 /* WebsiteTimeTrack – website. Dark by default, matching the logo's glow. */
 
 :root {
+    color-scheme: dark;
     --bg: #07090d;
     --panel: #11151c;
     --panel-2: #161b24;
@@ -175,7 +176,7 @@ figcaption { color: var(--muted); font-size: 14px; margin-top: 10px; }
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 18px;
 }
-.grid.two { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.grid.two { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
 
 .grid article {
     background: var(--panel);
