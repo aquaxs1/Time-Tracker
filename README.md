@@ -15,6 +15,7 @@ Everything stays on your machine.
 [![Manifest](https://img.shields.io/badge/manifest-V3-5f6caf)](WebsiteTimeTrack/manifest.json)
 [![Tests](https://img.shields.io/badge/tests-65%20passing-3fa96b)](WebsiteTimeTrack/test)
 [![Dependencies](https://img.shields.io/badge/runtime%20deps-none-lightgrey)](package.json)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
 </div>
 

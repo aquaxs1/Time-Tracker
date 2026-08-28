@@ -3,6 +3,7 @@
   "version": "2.1.0",
   "private": true,
   "description": "WebsiteTimeTrack — a browser extension that tracks time per website",
+  "license": "MIT",
   "scripts": {
     "test": "node --test WebsiteTimeTrack/test/unit.test.mjs WebsiteTimeTrack/test/background.test.mjs WebsiteTimeTrack/test/pages.test.mjs",
     "build": "bash WebsiteTimeTrack/build.sh",
