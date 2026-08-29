@@ -11,7 +11,7 @@ helps you stop. Daily limits, focus mode, categories and a weekly report.
 Everything stays on your machine.
 
 [![Website](https://img.shields.io/badge/website-timetrackerextension.vercel.app-2f8fff)](https://timetrackerextension.vercel.app)
-[![Download](https://img.shields.io/badge/download-Chrome%20%7C%20Firefox-27ae60)](https://github.com/aquaxs1/Time-Tracker/releases/latest)
+[![Download](https://img.shields.io/badge/download-Chrome%20%7C%20Firefox-27ae60)](https://timetrackerextension.vercel.app/download.html)
 [![Manifest](https://img.shields.io/badge/manifest-V3-5f6caf)](WebsiteTimeTrack/manifest.json)
 [![Tests](https://img.shields.io/badge/tests-65%20passing-3fa96b)](WebsiteTimeTrack/test)
 [![Dependencies](https://img.shields.io/badge/runtime%20deps-none-lightgrey)](package.json)
@@ -27,8 +27,8 @@ Grab a ready-to-load ZIP — nothing to compile:
 
 | Browser | Download | Then |
 |---|---|---|
-| **Chrome, Edge, Brave** | [`websitetimetrack-chrome.zip`](https://github.com/aquaxs1/Time-Tracker/releases/latest/download/websitetimetrack-chrome.zip) | `chrome://extensions` → Developer mode → *Load unpacked* → the `chrome` folder |
-| **Firefox** | [`websitetimetrack-firefox.zip`](https://github.com/aquaxs1/Time-Tracker/releases/latest/download/websitetimetrack-firefox.zip) | `about:debugging` → *This Firefox* → *Load Temporary Add-on* → `firefox/manifest.json` |
+| **Chrome, Edge, Brave** | [`websitetimetrack-chrome.zip`](https://timetrackerextension.vercel.app/downloads/websitetimetrack-chrome.zip) | `chrome://extensions` → Developer mode → *Load unpacked* → the `chrome` folder |
+| **Firefox** | [`websitetimetrack-firefox.zip`](https://timetrackerextension.vercel.app/downloads/websitetimetrack-firefox.zip) | `about:debugging` → *This Firefox* → *Load Temporary Add-on* → `firefox/manifest.json` |
 
 Firefox drops temporary add-ons when it closes — load it again after a restart.
 
@@ -37,6 +37,7 @@ Firefox drops temporary add-ons when it closes — load it again after a restart
 
 ```bash
 npm run build     # writes dist/chrome and dist/firefox
+npm run package   # the two ZIPs the website hands out, into site/downloads
 npm test          # 65 tests, no dependencies
 ```
 
@@ -230,4 +231,4 @@ keep the file outside the repository.
 
 - **Website** — <https://timetrackerextension.vercel.app>
 - **Terms of Use** — <https://timetrackerextension.vercel.app/terms.html>
-- **Releases** — <https://github.com/aquaxs1/Time-Tracker/releases>
+- **Downloads** — <https://timetrackerextension.vercel.app/download.html>

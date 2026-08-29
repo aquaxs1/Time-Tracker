@@ -7,7 +7,9 @@
   "scripts": {
     "test": "node --test WebsiteTimeTrack/test/unit.test.mjs WebsiteTimeTrack/test/background.test.mjs WebsiteTimeTrack/test/pages.test.mjs",
     "build": "bash WebsiteTimeTrack/build.sh",
-    "screenshots": "node tools/screenshots.mjs"
+    "screenshots": "node tools/screenshots.mjs",
+    "package": "bash tools/package.sh",
+    "verify:downloads": "bash tools/verify-downloads.sh"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

@@ -6,6 +6,10 @@
 *.zip
 dist/
 
+# ...ausser den fertigen Downloads der Website: die liefert Vercel statisch
+# aus, es gibt keinen Build-Schritt beim Deploy. Neu bauen mit `npm run package`.
+!site/downloads/*.zip
+
 node_modules/
 .DS_Store
 Thumbs.db

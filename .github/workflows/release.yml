@@ -38,6 +38,12 @@ jobs:
       - name: Build both targets
         run: npm run build
 
+      # The website hands out its own copy of the ZIPs from site/downloads/.
+      # Tagging a release while those are stale would ship two different
+      # builds under one version number.
+      - name: The website's ZIPs match this build
+        run: npm run verify:downloads
+
       # The tag is the single source of truth for the version. A manifest
       # that disagrees with it would ship an extension the browser reports
       # under a different number than the release it came from.
