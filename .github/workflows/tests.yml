@@ -39,6 +39,22 @@ jobs:
       - name: Run the test suite
         run: npm test
 
+  downloads:
+    name: Site downloads
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # site/downloads/ ships prebuilt ZIPs -- Vercel serves the folder as-is
+      # and never runs a build. A source change that misses them would leave
+      # visitors downloading an old extension with nothing to flag it.
+      - name: The shipped ZIPs match the source
+        run: npm run verify:downloads
+
   manifest:
     name: Validate manifest
     runs-on: ubuntu-latest

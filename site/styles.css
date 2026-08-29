@@ -221,6 +221,11 @@ figcaption { color: var(--muted); font-size: 14px; margin-top: 10px; }
 /* Prerequisite line above an install step list */
 .req { color: var(--muted); font-size: 15px; margin: 0 0 14px; }
 
+/* Checksums under the download buttons */
+.sums { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.sums li { display: grid; gap: 4px; }
+.sums .sum { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+
 /* ------------------------------------------------------------------ Footer */
 
 footer { border-top: 1px solid var(--line); background: var(--panel); }
