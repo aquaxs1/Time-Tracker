@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#07090d">
-<title>Terms of Use — WebsiteTimeTrack</title>
+<title>Terms of Use &amp; Privacy — WebsiteTimeTrack</title>
 <meta property="og:type" content="website">
-<meta property="og:title" content="Terms of Use — WebsiteTimeTrack">
+<meta property="og:title" content="Terms of Use &amp; Privacy — WebsiteTimeTrack">
 <meta property="og:description" content="A browser extension that measures your time per website. Local only.">
 <link rel="icon" href="assets/favicon.png">
 <link rel="apple-touch-icon" href="assets/logo.png">
@@ -36,8 +36,8 @@
 </header>
 
 <main class="prose">
-    <h1>Terms of Use</h1>
-    <p class="updated">Last updated: 29 August 2026</p>
+    <h1>Terms of Use &amp; Privacy</h1>
+    <p class="updated">Last updated: 16 October 2026</p>
 
     <h2>1. What these terms cover</h2>
     <p>They cover the WebsiteTimeTrack browser extension and this website. Installing
@@ -47,10 +47,71 @@
     <p>WebsiteTimeTrack is a free, open-source browser extension. You install it
        yourself from source. There is no service behind it and no account.</p>
 
-    <h2>3. Your data</h2>
-    <p>The extension stores your data in your own browser and sends it nowhere.
-       Nothing is collected, transmitted or sold. Backups you export are yours to
-       keep — and yours to look after.</p>
+    <h2 id="privacy">3. Privacy</h2>
+
+    <h3>Who is responsible</h3>
+    <p>WebsiteTimeTrack and this site are run by Sebi. For anything about your data,
+       message <a href="https://t.me/aquaxs">@aquaxs on Telegram</a>.</p>
+
+    <h3>The extension</h3>
+    <p>What it records stays in your own browser. The extension makes no network
+       requests — no server, no account, no analytics, no telemetry — so none of it
+       ever reaches Sebi.</p>
+    <ul>
+        <li><strong>Times</strong> — how long you spend on each website (by domain), per day,
+            kept for 365 days.</li>
+        <li><strong>Sub-entries</strong> — with “Track sub-entities” (on by default), also the
+            YouTube channel, GitHub or GitLab repository, subreddit, Twitch channel,
+            X profile or Stack Overflow question, kept for 60 days. The YouTube channel
+            name is read from the page; everything else comes from the address. Domains
+            you add for section capture record the first part of the path.</li>
+        <li><strong>Activity</strong> — that you are using a page (mouse, keyboard, scroll), so an
+            idle tab doesn't count. Not what you type.</li>
+        <li><strong>Settings and weekly reports</strong> — limits, categories, the ignore list,
+            focus mode and your past reports.</li>
+        <li><strong>Never</strong> — other page content, form data, passwords, or anything on sites
+            in your ignore list.</li>
+    </ul>
+
+    <h3>Browser sync</h3>
+    <p>Settings are kept in your browser's sync storage. If you are signed in to your
+       browser's sync (with Google in Chrome, Mozilla in Firefox or Microsoft in Edge,
+       for example), the browser copies them to your other devices through that
+       provider, under its privacy policy; otherwise they stay on this device.
+       “Sync usage data between devices” is off by default. Turned on, it does the
+       same for your times of the last days you choose (14 by default, at most 30),
+       per domain and in seconds. Turning it off removes this device's times from
+       sync storage again.</p>
+
+    <h3>Your copy, your control</h3>
+    <ul>
+        <li>CSV exports and JSON backups are files you save yourself — they hold the same
+            data, so look after them.</li>
+        <li>“Delete” next to a site or “Reset everything” in the popup removes recorded
+            times.</li>
+    </ul>
+
+    <h3>This website</h3>
+    <ul>
+        <li><strong>Hosting</strong> — this site and its downloads are hosted by Vercel Inc. (USA).
+            Vercel processes connection data (IP address, time, requested file, browser)
+            to deliver the pages and protect them against abuse — legitimate interest,
+            Art. 6(1)(f) GDPR. Vercel is certified under the EU-US Data Privacy
+            Framework.</li>
+        <li><strong>No cookies, no tracking</strong> — no analytics, no ads, no external scripts or
+            fonts, and nothing stored in your browser.</li>
+        <li><strong>GitHub</strong> — links to the source code and issues lead to GitHub (GitHub
+            Inc., USA, also certified under the Data Privacy Framework), where GitHub's
+            own privacy policy applies.</li>
+    </ul>
+
+    <h3>Your rights</h3>
+    <p>You can ask for access to your data, correction, deletion, restriction, a copy,
+       and object to processing based on legitimate interest (Art. 15–21 GDPR) — on
+       Telegram, <a href="https://t.me/aquaxs">@aquaxs</a>. Since the extension's data never
+       reaches Sebi, that concerns the hosting data above. You can also complain to a
+       data protection authority; in Austria that is the Datenschutzbehörde
+       (<a href="https://www.dsb.gv.at">dsb.gv.at</a>).</p>
 
     <h2>4. Acceptable use</h2>
     <p>It is meant to track and limit your own browsing on your own machine. Do not
@@ -72,9 +133,11 @@
        disable the extension. Treat them as a reminder, not a guarantee.</p>
 
     <h2>8. Third parties</h2>
-    <p>The extension talks to no server of ours; there is none. It is distributed
-       through GitHub releases and this site is served by its host, each under their
-       own terms. Your browser vendor's rules apply to loading an unpacked extension.</p>
+    <p>The extension talks to no server of ours; there is none. The downloads come
+       from this site, hosted by Vercel; the same ZIPs are attached to GitHub releases.
+       Browser sync, if you use it, is run by your browser's provider. Each works under
+       its own terms, and your browser vendor's rules apply to loading an unpacked
+       extension.</p>
 
     <h2>9. Trademarks and affiliation</h2>
     <p>An independent project, not affiliated with or endorsed by Google, Mozilla,
@@ -85,8 +148,10 @@
        lives in the <a href="https://github.com/aquaxs1/Time-Tracker">repository</a>.</p>
 
     <h2>11. Contact</h2>
-    <p>Questions and bug reports go through
-       <a href="https://github.com/aquaxs1/Time-Tracker/issues">GitHub issues</a>.</p>
+    <p>WebsiteTimeTrack is run by Sebi. Questions and bug reports go through
+       <a href="https://github.com/aquaxs1/Time-Tracker/issues">GitHub issues</a>, which are
+       public; anything about your data goes to
+       <a href="https://t.me/aquaxs">@aquaxs on Telegram</a>.</p>
 </main>
 
 <footer>
@@ -97,7 +162,7 @@
         </a>
         <nav class="foot-links">
             <a href="index.html#features">Features</a>
-            <a href="index.html#privacy">Privacy</a>
+            <a href="terms.html#privacy">Privacy</a>
             <a href="download.html">Download</a>
             <a href="setup.html">Setup</a>
             <a href="terms.html">Terms of Use</a>

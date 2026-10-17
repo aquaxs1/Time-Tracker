@@ -249,6 +249,7 @@ footer { border-top: 1px solid var(--line); background: var(--panel); }
 .prose { max-width: 720px; margin: 0 auto; padding: 56px 24px 72px; }
 .prose h1 { font-size: 32px; margin-bottom: 8px; }
 .prose h2 { font-size: 19px; margin: 32px 0 8px; }
+.prose h3 { font-size: 16px; margin: 20px 0 6px; }
 .prose p, .prose li { color: var(--muted); }
 .prose ul { padding-left: 20px; }
 .prose li { margin: 6px 0; }

@@ -162,15 +162,16 @@
 <!-- --------------------------------------------------------------- Privacy -->
 <section id="privacy" class="section">
     <h2>Privacy</h2>
-    <p class="lede">Nothing is tracked. Nothing leaves your machine.</p>
+    <p class="lede">No server, no tracking. The extension itself sends nothing anywhere.</p>
 
     <div class="grid two">
         <article class="ok">
             <h3>What the extension does</h3>
             <ul>
                 <li>Stores times in your browser's local storage</li>
-                <li>Reads the domain of the tab you are looking at</li>
+                <li>Reads the domain of the tab you are looking at — and on YouTube, the channel name</li>
                 <li>Runs entirely offline — it makes no network requests at all</li>
+                <li>Keeps settings in your browser's sync storage, so browser sync carries them to your other devices if you use it</li>
             </ul>
         </article>
         <article class="no">
@@ -178,7 +179,7 @@
             <ul>
                 <li>No account, no login, no server</li>
                 <li>No analytics, no telemetry, no ads</li>
-                <li>No page content, no form data, no passwords</li>
+                <li>No other page content, no form data, no passwords</li>
                 <li>No external scripts or fonts</li>
             </ul>
         </article>
@@ -187,7 +188,7 @@
     <h3 class="sub">Why each permission is needed</h3>
     <table class="perms">
         <tr><td><code>tabs</code></td><td>Read the domain of the active tab</td></tr>
-        <tr><td><code>storage</code></td><td>Save your times and settings locally</td></tr>
+        <tr><td><code>storage</code></td><td>Save your times and settings in your browser</td></tr>
         <tr><td><code>idle</code></td><td>Stop counting when you step away</td></tr>
         <tr><td><code>alarms</code></td><td>Write pending time down once a minute</td></tr>
         <tr><td><code>notifications</code></td><td>Limit warnings and the weekly report</td></tr>
@@ -196,7 +197,8 @@
     </table>
 
     <p class="note">Device sync is off by default. Turned on, it uses your browser's
-       own sync storage — the same channel as your bookmarks, not a server of ours.</p>
+       own sync storage — the same channel as your bookmarks, not a server of ours.
+       All the details are in the <a href="terms.html#privacy">privacy notice</a>.</p>
 </section>
 
 <!-- -------------------------------------------------------------- Download -->
@@ -212,7 +214,7 @@
         </a>
         <nav class="foot-links">
             <a href="#features">Features</a>
-            <a href="#privacy">Privacy</a>
+            <a href="terms.html#privacy">Privacy</a>
             <a href="download.html">Download</a>
             <a href="setup.html">Setup</a>
             <a href="terms.html">Terms of Use</a>

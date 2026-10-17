@@ -133,8 +133,11 @@ The unbuilt `WebsiteTimeTrack/` folder also loads directly in Chrome.
 
 The extension makes **no network requests at all**. There is no account, no
 server, no analytics and no telemetry. It reads the domain of the tab you are
-looking at and writes times into your own browser storage — nothing else, and
-nothing leaves your machine.
+looking at (and, on YouTube, the channel name) and writes times into your own
+browser storage. The only thing that can leave your machine is what your
+browser's own sync carries, if you use it: your settings, and the last few days
+of times if you turn on device sync. Full notice:
+[timetrackerextension.vercel.app/terms.html#privacy](https://timetrackerextension.vercel.app/terms.html#privacy).
 
 ---
 
