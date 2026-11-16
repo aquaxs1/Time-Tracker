@@ -1,228 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#07090d">
-<title>WebsiteTimeTrack — Know where your time goes</title>
-<meta property="og:type" content="website">
-<meta property="og:title" content="WebsiteTimeTrack — Know where your time goes">
-<meta property="og:description" content="A browser extension that measures your time per website. Local only, with daily limits, focus mode, categories and a weekly report.">
-<meta name="description" content="A browser extension that measures your time per website. Local only, with daily limits, focus mode, categories and a weekly report.">
-<link rel="icon" href="assets/favicon.png">
-<link rel="apple-touch-icon" href="assets/logo.png">
-<link rel="stylesheet" href="styles.css">
-<meta property="og:image" content="https://timetrackerextension.vercel.app/assets/og-image.png">
-<meta property="og:url" content="https://timetrackerextension.vercel.app/">
-<link rel="canonical" href="https://timetrackerextension.vercel.app/">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WebsiteTimeTrack — Know where your time goes</title>
+  <meta name="description" content="A browser extension that measures your time per website. Local only, with daily limits, focus mode and a weekly report. For Chrome and Firefox.">
+  <link rel="canonical" href="https://timetrackerextension.vercel.app/">
+  <meta name="theme-color" content="#050806">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="WebsiteTimeTrack">
+  <meta property="og:title" content="WebsiteTimeTrack — Know where your time goes">
+  <meta property="og:description" content="A browser extension that measures your time per website. Local only, with daily limits, focus mode and a weekly report. For Chrome and Firefox.">
+  <meta property="og:url" content="https://timetrackerextension.vercel.app/">
+  <meta property="og:image" content="https://timetrackerextension.vercel.app/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/favicon.png">
+  <link rel="preload" href="assets/aqx/fonts/bodoni-moda-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/aqx/fonts/inter-tight-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/aqx/aqx.css">
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/aqx/boot.js"></script>
+  <script type="module" src="assets/aqx/aqx.js"></script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "WebsiteTimeTrack", "description": "A browser extension that measures your time per website. Local only, with daily limits, focus mode and a weekly report. For Chrome and Firefox.", "url": "https://timetrackerextension.vercel.app/", "applicationCategory": "BrowserApplication", "operatingSystem": "Chrome, Edge, Brave, Firefox", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "author": {"@type": "Person", "name": "AquAxs", "url": "https://aqua.is-a.dev/"}, "image": "https://timetrackerextension.vercel.app/assets/og-image.png", "softwareVersion": "2.1.0", "license": "https://opensource.org/licenses/MIT", "sameAs": ["https://github.com/aquaxs1/Time-Tracker"]}</script>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
+  <canvas class="aqx-sky" aria-hidden="true"></canvas>
+  <div class="aqx-aura" aria-hidden="true"></div>
+  <div class="aqx-progress" aria-hidden="true"></div>
 
-<header class="nav">
-    <a class="brand" href="#top">
-        <img src="assets/logo.png" alt="" width="32" height="32">
-        <span>WebsiteTimeTrack</span>
-    </a>
-    <nav>
-        <a href="#features">Features</a>
-        <a href="#privacy">Privacy</a>
-        <a href="download.html">Download</a>
-        <a href="setup.html">Setup</a>
-        <a href="https://github.com/aquaxs1/Time-Tracker">GitHub</a>
-    </nav>
-</header>
+  <header class="nav" data-stuck="false" data-open="false">
+    <div class="nav-inner">
+      <a class="brand" href="./" aria-label="WebsiteTimeTrack home"><img src="assets/logo.png" alt="" width="32" height="32"><span>WebsiteTimeTrack</span></a>
+      <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="./#features">Features</a></li>
+        <li><a href="./#privacy">Privacy</a></li>
+        <li><a href="setup">Setup</a></li>
+        <li><a href="https://github.com/aquaxs1/Time-Tracker" rel="noopener">GitHub</a></li>
+        <li><a class="btn btn-primary btn-sm" href="download">Download</a></li>
+      </ul>
+    </div>
+  </header>
 
-<main id="top">
-
-<!-- ------------------------------------------------------------------ Hero -->
-<section class="hero">
-    <div class="hero-text">
-        <h1>Know where your time goes.</h1>
-        <p class="lede">Measures how long you spend on every website — then helps you
-           stop. Daily limits, focus mode and a weekly report. All local.</p>
-        <div class="cta">
-            <a class="btn primary" href="download.html">Download</a>
-            <a class="btn" href="#features">View Features</a>
+  <main id="main">
+    <section class="hero">
+      <div class="stage" data-scene="assets/scene.js" data-mode="hero" aria-hidden="true"><canvas></canvas></div>
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <span class="eyebrow">Browser extension · Chrome &amp; Firefox</span>
+          <h1>Know where your <em>time goes.</em></h1>
+          <p class="lead">Measures how long you spend on every website — then helps you stop. Daily limits, focus mode and a weekly report. All local.</p>
+          <div class="btn-row">
+            <a class="btn btn-primary btn-lg" href="download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>Download</a>
+            <a class="btn btn-lg" href="#features">View Features</a>
+          </div>
+          <p class="hero-note">No account · No servers · Chrome &amp; Firefox</p>
         </div>
-        <ul class="badges">
-            <li>No account</li>
-            <li>No servers</li>
-            <li>Chrome &amp; Firefox</li>
-        </ul>
-    </div>
-    <div class="hero-shot">
-        <img src="assets/popup-sites.png" alt="The extension popup showing time per website" width="360" height="439">
-    </div>
-</section>
+      </div>
+      <span class="hero-hint">Click for focus mode</span>
+    </section>
 
-<!-- --------------------------------------------------------------- Screens -->
-<section class="screens">
-    <figure>
-        <img src="assets/popup-detail.png" alt="Popup with a site expanded into channels and repos" width="360" height="506">
-        <figcaption>Channels &amp; repos, not just domains</figcaption>
-    </figure>
-    <figure>
-        <img src="assets/popup-history.png" alt="Popup showing a 30 day history chart" width="360" height="366">
-        <figcaption>30-day history</figcaption>
-    </figure>
-    <figure>
-        <img src="assets/popup-categories.png" alt="Popup showing time split by category" width="360" height="327">
-        <figcaption>Categories &amp; score</figcaption>
-    </figure>
-    <figure>
-        <img src="assets/blocked.png" alt="The block screen shown when a daily limit is reached" width="288" height="252">
-        <figcaption>Block screen when a limit is hit</figcaption>
-    </figure>
-</section>
+    <section class="sec" id="screens">
+      <div class="wrap">
+        <div class="sec-head center reveal">
+          <span class="eyebrow">The popup</span>
+          <h2>One click, <em>the whole day</em></h2>
+        </div>
+      </div>
+      <div class="coverflow popups reveal">
+        <figure class="shot">
+          <img src="assets/popup-sites.png" alt="The extension popup showing time per website" width="360" height="439" loading="lazy" decoding="async">
+          <figcaption><b>Time per website</b>Sorted, with favicons</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/popup-detail.png" alt="Popup with a site expanded into channels and repos" width="360" height="506" loading="lazy" decoding="async">
+          <figcaption><b>Beyond domains</b>Channels &amp; repos, not just domains</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/popup-history.png" alt="Popup showing a 30 day history chart" width="360" height="366" loading="lazy" decoding="async">
+          <figcaption><b>History</b>30-day history</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/popup-categories.png" alt="Popup showing time split by category" width="360" height="327" loading="lazy" decoding="async">
+          <figcaption><b>Categories</b>Categories &amp; score</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/blocked.png" alt="The block screen shown when a daily limit is reached" width="288" height="252" loading="lazy" decoding="async">
+          <figcaption><b>Limits</b>Block screen when a limit is hit</figcaption>
+        </figure>
+      </div>
+      <div class="coverflow-nav">
+        <button type="button" data-dir="-1" aria-label="Previous picture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+        <button type="button" data-dir="1" aria-label="Next picture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div>
+    </section>
 
-<!-- -------------------------------------------------------------- Features -->
-<section id="features" class="section">
-    <h2>Features</h2>
-
-    <div class="grid">
-        <article>
+    <section class="sec" id="features">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="eyebrow">Features</span>
+          <h2>What it <em>measures</em>, and what you do with it</h2>
+        </div>
+        <div class="cards" data-cols="3">
+          <article class="card reveal">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span>
             <h3>Accurate measurement</h3>
             <ul>
-                <li>Counts only with an active tab, a focused window and a non-idle user</li>
-                <li>Optional: count only on real input — mouse, keyboard, scroll</li>
-                <li>Tabs playing audio still count, so videos aren't read as a pause</li>
-                <li>The idle threshold is subtracted retroactively</li>
-                <li>Sessions crossing midnight are split across both days</li>
-                <li>Sleep and standby never turn into fake hours</li>
+              <li>Counts only with an active tab, a focused window and a non-idle user</li>
+              <li>Optional: count only on real input — mouse, keyboard, scroll</li>
+              <li>Tabs playing audio still count, so videos aren't read as a pause</li>
+              <li>The idle threshold is subtracted retroactively</li>
+              <li>Sessions crossing midnight are split across both days</li>
+              <li>Sleep and standby never turn into fake hours</li>
             </ul>
-        </article>
-
-        <article>
+          </article>
+          <article class="card reveal">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5zM3 13l9 5 9-5M3 17.5l9 5 9-5"/></svg></span>
             <h3>Beyond domains</h3>
             <ul>
-                <li>YouTube — time per channel</li>
-                <li>GitHub and GitLab — time per repository</li>
-                <li>Reddit — time per subreddit</li>
-                <li>Twitch and X — time per channel or profile</li>
-                <li>Any domain — first path segment, if you enable it</li>
+              <li>YouTube — time per channel</li>
+              <li>GitHub and GitLab — time per repository</li>
+              <li>Reddit — time per subreddit</li>
+              <li>Twitch and X — time per channel or profile</li>
+              <li>Any domain — first path segment, if you enable it</li>
             </ul>
-        </article>
-
-        <article>
+          </article>
+          <article class="card reveal">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg></span>
             <h3>Insight</h3>
             <ul>
-                <li>Today, 7 days, 30 days, all time</li>
-                <li>Sorted ranking with favicons and category colours</li>
-                <li>30-day history chart</li>
-                <li>Seven categories, ~100 domains pre-assigned</li>
-                <li>Productivity score from 0 to 100</li>
-                <li>Weekly report with a comparison to last week</li>
+              <li>Today, 7 days, 30 days, all time</li>
+              <li>Sorted ranking with favicons and category colours</li>
+              <li>30-day history chart</li>
+              <li>Seven categories, ~100 domains pre-assigned</li>
+              <li>Productivity score from 0 to 100</li>
+              <li>Weekly report with a comparison to last week</li>
             </ul>
-        </article>
-
-        <article>
+          </article>
+          <article class="card reveal">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12M6 21h12M7 3c0 5 5 6 5 9s-5 4-5 9M17 3c0 5-5 6-5 9s5 4 5 9"/></svg></span>
             <h3>Control</h3>
             <ul>
-                <li>Daily limit per site, in minutes</li>
-                <li>Warning notification at a threshold you pick</li>
-                <li>Optional blocking with its own block screen</li>
-                <li>Focus mode with an expiry time</li>
-                <li>5-minute snooze when you really need it</li>
-                <li>Ignore list for sites that shouldn't be tracked</li>
+              <li>Daily limit per site, in minutes</li>
+              <li>Warning notification at a threshold you pick</li>
+              <li>Optional blocking with its own block screen</li>
+              <li>Focus mode with an expiry time</li>
+              <li>5-minute snooze when you really need it</li>
+              <li>Ignore list for sites that shouldn't be tracked</li>
             </ul>
-        </article>
-
-        <article>
+          </article>
+          <article class="card reveal">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.700 3.600 3 8 3s8-1.300 8-3V6M4 12v6c0 1.700 3.600 3 8 3s8-1.300 8-3v-6"/></svg></span>
             <h3>Your data</h3>
             <ul>
-                <li>CSV export, one row per day and domain</li>
-                <li>Full JSON backup, including settings</li>
-                <li>Import to merge or replace</li>
-                <li>Delete a single site or everything</li>
-                <li>Optional device sync through your browser profile</li>
+              <li>CSV export, one row per day and domain</li>
+              <li>Full JSON backup, including settings</li>
+              <li>Import to merge or replace</li>
+              <li>Delete a single site or everything</li>
+              <li>Optional device sync through your browser profile</li>
             </ul>
-        </article>
-
-        <article>
+          </article>
+          <article class="card reveal">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h4v2.500a1.500 1.500 0 1 0 3 0V4h4v5h-2.500a1.500 1.500 0 1 0 0 3H20v8h-5v-2.500a1.500 1.500 0 1 0-3 0V20H4v-6h2.500a1.500 1.500 0 1 0 0-3H4V4z"/></svg></span>
             <h3>Built to last</h3>
             <ul>
-                <li>Manifest V3, Chrome and Firefox</li>
-                <li>No frameworks and no runtime dependencies</li>
-                <li>365 days of history, pruned automatically</li>
-                <li>65 tests, run with <code>npm test</code></li>
+              <li>Manifest V3, Chrome and Firefox</li>
+              <li>No frameworks and no runtime dependencies</li>
+              <li>365 days of history, pruned automatically</li>
+              <li>65 tests, run with <code>npm test</code></li>
             </ul>
-        </article>
-    </div>
+          </article>
+        </div>
+      </div>
+    </section>
 
-    <figure class="wide">
-        <img src="assets/options.png" alt="The settings page with limits, focus mode and categories" width="760" height="900" loading="lazy">
-        <figcaption>Everything is configurable on the settings page</figcaption>
-    </figure>
-</section>
+    <section class="sec" id="settings">
+      <div class="wrap">
+        <div class="split">
+          <div class="stack reveal">
+            <span class="eyebrow">Settings</span>
+            <h2>Limits you <em>set yourself</em></h2>
+            <p class="lead">Daily limit per site, a warning at a threshold you pick, and optional blocking with its own block screen. Focus mode blocks social and entertainment sites for an hour.</p>
+            <a class="btn" href="setup">The first five minutes<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+          <div class="showcase reveal">
+            <figure class="shot">
+              <img src="assets/options.png" alt="The settings page with limits, focus mode and categories" width="760" height="900" loading="lazy" decoding="async">
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<!-- --------------------------------------------------------------- Privacy -->
-<section id="privacy" class="section">
-    <h2>Privacy</h2>
-    <p class="lede">No server, no tracking. The extension itself sends nothing anywhere.</p>
-
-    <div class="grid two">
-        <article class="ok">
+    <section class="sec" id="privacy">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <span class="eyebrow">Privacy</span>
+          <h2>No server, <em>no tracking</em></h2>
+          <p class="lead">The extension itself sends nothing anywhere.</p>
+        </div>
+        <div class="cards" data-cols="2">
+          <article class="card plus reveal">
             <h3>What the extension does</h3>
             <ul>
-                <li>Stores times in your browser's local storage</li>
-                <li>Reads the domain of the tab you are looking at — and on YouTube, the channel name</li>
-                <li>Runs entirely offline — it makes no network requests at all</li>
-                <li>Keeps settings in your browser's sync storage, so browser sync carries them to your other devices if you use it</li>
+              <li>Stores times in your browser's local storage</li>
+              <li>Reads the domain of the tab you are looking at — and on YouTube, the channel name</li>
+              <li>Runs entirely offline — it makes no network requests at all</li>
+              <li>Keeps settings in your browser's sync storage, so browser sync carries them to your other devices if you use it</li>
             </ul>
-        </article>
-        <article class="no">
+          </article>
+          <article class="card minus reveal">
             <h3>What it never does</h3>
             <ul>
-                <li>No account, no login, no server</li>
-                <li>No analytics, no telemetry, no ads</li>
-                <li>No other page content, no form data, no passwords</li>
-                <li>No external scripts or fonts</li>
+              <li>No account, no login, no server</li>
+              <li>No analytics, no telemetry, no ads</li>
+              <li>No other page content, no form data, no passwords</li>
+              <li>No external scripts or fonts</li>
             </ul>
-        </article>
-    </div>
+          </article>
+        </div>
+      </div>
+    </section>
 
-    <h3 class="sub">Why each permission is needed</h3>
-    <table class="perms">
-        <tr><td><code>tabs</code></td><td>Read the domain of the active tab</td></tr>
-        <tr><td><code>storage</code></td><td>Save your times and settings in your browser</td></tr>
-        <tr><td><code>idle</code></td><td>Stop counting when you step away</td></tr>
-        <tr><td><code>alarms</code></td><td>Write pending time down once a minute</td></tr>
-        <tr><td><code>notifications</code></td><td>Limit warnings and the weekly report</td></tr>
-        <tr><td><code>favicon</code></td><td>Show site icons from the browser's own cache</td></tr>
-        <tr><td>content script</td><td>Detect real input and read the YouTube channel name</td></tr>
-    </table>
+    <section class="sec" id="permissions">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <h2>Why each permission <em>is needed</em></h2>
+        </div>
+        <div class="table-wrap reveal">
+          <table>
+            <thead>
+              <tr>
+                <th>Permission</th>
+                <th>What for</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>tabs</code></td>
+                <td>Read the domain of the active tab</td>
+              </tr>
+              <tr>
+                <td><code>storage</code></td>
+                <td>Save your times and settings in your browser</td>
+              </tr>
+              <tr>
+                <td><code>idle</code></td>
+                <td>Stop counting when you step away</td>
+              </tr>
+              <tr>
+                <td><code>alarms</code></td>
+                <td>Write pending time down once a minute</td>
+              </tr>
+              <tr>
+                <td><code>notifications</code></td>
+                <td>Limit warnings and the weekly report</td>
+              </tr>
+              <tr>
+                <td><code>favicon</code></td>
+                <td>Show site icons from the browser's own cache</td>
+              </tr>
+              <tr>
+                <td>content script</td>
+                <td>Detect real input and read the YouTube channel name</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-    <p class="note">Device sync is off by default. Turned on, it uses your browser's
-       own sync storage — the same channel as your bookmarks, not a server of ours.
-       All the details are in the <a href="terms.html#privacy">privacy notice</a>.</p>
-</section>
+    <section class="sec">
+      <div class="wrap">
+        <div class="note reveal">
+          <p>Device sync is off by default. Turned on, it uses your browser's own sync storage — the same channel as your bookmarks, not a server of ours. All the details are in the <a class="textlink" href="terms#privacy">privacy notice</a>.</p>
+        </div>
+      </div>
+    </section>
 
-<!-- -------------------------------------------------------------- Download -->
+    <section class="sec">
+      <div class="wrap">
+        <div class="cta reveal">
+          <h2>See your day <em>as it was</em></h2>
+          <p class="lead">Ready to load, nothing to compile. No account, no servers.</p>
+          <div class="btn-row">
+            <a class="btn btn-primary btn-lg" href="download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg>Download</a>
+            <a class="btn btn-lg" href="https://github.com/aquaxs1/Time-Tracker" rel="noopener">View source</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-</main>
-
-<!-- ---------------------------------------------------------------- Footer -->
-<footer>
-    <div class="foot-inner">
-        <a class="brand" href="#top">
-            <img src="assets/logo.png" alt="" width="24" height="24">
-            <span>WebsiteTimeTrack</span>
-        </a>
-        <nav class="foot-links">
-            <a href="#features">Features</a>
-            <a href="terms.html#privacy">Privacy</a>
-            <a href="download.html">Download</a>
-            <a href="setup.html">Setup</a>
-            <a href="terms.html">Terms of Use</a>
-            <a href="https://github.com/aquaxs1/Time-Tracker">GitHub</a>
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-about">
+          <a class="brand" href="./"><img src="assets/logo.png" alt="" width="32" height="32" loading="lazy"><span>WebsiteTimeTrack</span></a>
+          <p>Measures how long you spend on every website — then helps you stop. All local.</p>
+        </div>
+        <nav class="footer-col" aria-label="Extension">
+          <h2>Extension</h2>
+          <ul>
+            <li><a href="./#features">Features</a></li>
+            <li><a href="./#privacy">Privacy</a></li>
+            <li><a href="download">Download</a></li>
+            <li><a href="setup">Setup</a></li>
+          </ul>
         </nav>
-        <p class="copy">© 2026 aquaxs1</p>
+        <nav class="footer-col" aria-label="Project">
+          <h2>Project</h2>
+          <ul>
+            <li><a href="https://github.com/aquaxs1/Time-Tracker" rel="noopener">GitHub</a></li>
+            <li><a href="https://github.com/aquaxs1/Time-Tracker/issues" rel="noopener">Report a problem</a></li>
+          </ul>
+        </nav>
+        <nav class="footer-col" aria-label="Legal">
+          <h2>Legal</h2>
+          <ul>
+            <li><a href="terms">Terms of Use</a></li>
+            <li><a href="terms#privacy">Privacy notice</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="family">
+        <span class="family-label">More by AquAxs</span>
+        <ul>
+          <li><a href="https://aqua.is-a.dev/portfolio" data-home rel="noopener">All projects</a></li>
+          <li><a href="https://pfpair.app/" rel="noopener">Pfpair</a></li>
+          <li><a href="https://handled-market.vercel.app/" rel="noopener">Handled</a></li>
+          <li><a href="https://larpcorddc.vercel.app/" rel="noopener">Larpcord</a></li>
+          <li><a href="https://mybluejarvis.vercel.app/" rel="noopener">My Jarvis</a></li>
+          <li><a href="https://guardiantus-av.vercel.app/" rel="noopener">Guardiantus AV</a></li>
+          <li><a href="https://explorer-manager.vercel.app/" rel="noopener">Explorer Manager</a></li>
+          <li><a href="https://cipher-box-file-encrypter.vercel.app/" rel="noopener">CipherBox</a></li>
+          <li><a href="https://easy-cloner.vercel.app/" rel="noopener">Easy Server Cloner</a></li>
+          <li><a href="https://simple-skin.vercel.app/" rel="noopener">Simple Skin</a></li>
+          <li><a href="https://autobuild-gui.vercel.app/" rel="noopener">Autobuild GUI</a></li>
+          <li><a href="https://wave-uninstaller.vercel.app/" rel="noopener">Wave Uninstaller</a></li>
+          <li><a href="https://discord-sakurabot.vercel.app/" rel="noopener">Sakura Bot</a></li>
+          <li><a href="https://revox-client.vercel.app/" rel="noopener">Revox Client</a></li>
+          <li><a href="https://chesstrainer.cc.cd/" rel="noopener">Chess Trainer</a></li>
+        </ul>
+      </div>
+      <div class="footer-legal">
+        <p>© 2026 AquAxs. Released under the MIT License.</p>
+      </div>
     </div>
-</footer>
-
+  </footer>
 </body>
 </html>

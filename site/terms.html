@@ -1,176 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#07090d">
-<title>Terms of Use &amp; Privacy — WebsiteTimeTrack</title>
-<meta property="og:type" content="website">
-<meta property="og:title" content="Terms of Use &amp; Privacy — WebsiteTimeTrack">
-<meta property="og:description" content="A browser extension that measures your time per website. Local only.">
-<link rel="icon" href="assets/favicon.png">
-<link rel="apple-touch-icon" href="assets/logo.png">
-<link rel="stylesheet" href="styles.css">
-<meta property="og:image" content="https://timetrackerextension.vercel.app/assets/og-image.png">
-<meta property="og:url" content="https://timetrackerextension.vercel.app/terms.html">
-<link rel="canonical" href="https://timetrackerextension.vercel.app/terms.html">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Terms of Use &amp; Privacy — WebsiteTimeTrack</title>
+  <meta name="description" content="Terms of use and privacy notice for the WebsiteTimeTrack browser extension and this website.">
+  <link rel="canonical" href="https://timetrackerextension.vercel.app/terms">
+  <meta name="theme-color" content="#050806">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="WebsiteTimeTrack">
+  <meta property="og:title" content="Terms of Use &amp; Privacy — WebsiteTimeTrack">
+  <meta property="og:description" content="Terms of use and privacy notice for the WebsiteTimeTrack browser extension and this website.">
+  <meta property="og:url" content="https://timetrackerextension.vercel.app/terms">
+  <meta property="og:image" content="https://timetrackerextension.vercel.app/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/favicon.png">
+  <link rel="preload" href="assets/aqx/fonts/bodoni-moda-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/aqx/fonts/inter-tight-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/aqx/aqx.css">
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/aqx/boot.js"></script>
+  <script type="module" src="assets/aqx/aqx.js"></script>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
+  <canvas class="aqx-sky" aria-hidden="true"></canvas>
+  <div class="aqx-aura" aria-hidden="true"></div>
+  <div class="aqx-progress" aria-hidden="true"></div>
 
-<header class="nav">
-    <a class="brand" href="index.html">
-        <img src="assets/logo.png" alt="" width="32" height="32">
-        <span>WebsiteTimeTrack</span>
-    </a>
-    <nav>
-        <a href="index.html#features">Features</a>
-        <a href="index.html#privacy">Privacy</a>
-        <a href="download.html">Download</a>
-        <a href="setup.html">Setup</a>
-        <a href="https://github.com/aquaxs1/Time-Tracker">GitHub</a>
-    </nav>
-</header>
-
-<main class="prose">
-    <h1>Terms of Use &amp; Privacy</h1>
-    <p class="updated">Last updated: 16 October 2026</p>
-
-    <h2>1. What these terms cover</h2>
-    <p>They cover the WebsiteTimeTrack browser extension and this website. Installing
-       or using the extension means you accept them. If you do not, do not install it.</p>
-
-    <h2>2. What this is</h2>
-    <p>WebsiteTimeTrack is a free, open-source browser extension. You install it
-       yourself from source. There is no service behind it and no account.</p>
-
-    <h2 id="privacy">3. Privacy</h2>
-
-    <h3>Who is responsible</h3>
-    <p>WebsiteTimeTrack and this site are run by Sebi. For anything about your data,
-       message <a href="https://t.me/aquaxs">@aquaxs on Telegram</a>.</p>
-
-    <h3>The extension</h3>
-    <p>What it records stays in your own browser. The extension makes no network
-       requests — no server, no account, no analytics, no telemetry — so none of it
-       ever reaches Sebi.</p>
-    <ul>
-        <li><strong>Times</strong> — how long you spend on each website (by domain), per day,
-            kept for 365 days.</li>
-        <li><strong>Sub-entries</strong> — with “Track sub-entities” (on by default), also the
-            YouTube channel, GitHub or GitLab repository, subreddit, Twitch channel,
-            X profile or Stack Overflow question, kept for 60 days. The YouTube channel
-            name is read from the page; everything else comes from the address. Domains
-            you add for section capture record the first part of the path.</li>
-        <li><strong>Activity</strong> — that you are using a page (mouse, keyboard, scroll), so an
-            idle tab doesn't count. Not what you type.</li>
-        <li><strong>Settings and weekly reports</strong> — limits, categories, the ignore list,
-            focus mode and your past reports.</li>
-        <li><strong>Never</strong> — other page content, form data, passwords, or anything on sites
-            in your ignore list.</li>
-    </ul>
-
-    <h3>Browser sync</h3>
-    <p>Settings are kept in your browser's sync storage. If you are signed in to your
-       browser's sync (with Google in Chrome, Mozilla in Firefox or Microsoft in Edge,
-       for example), the browser copies them to your other devices through that
-       provider, under its privacy policy; otherwise they stay on this device.
-       “Sync usage data between devices” is off by default. Turned on, it does the
-       same for your times of the last days you choose (14 by default, at most 30),
-       per domain and in seconds. Turning it off removes this device's times from
-       sync storage again.</p>
-
-    <h3>Your copy, your control</h3>
-    <ul>
-        <li>CSV exports and JSON backups are files you save yourself — they hold the same
-            data, so look after them.</li>
-        <li>“Delete” next to a site or “Reset everything” in the popup removes recorded
-            times.</li>
-    </ul>
-
-    <h3>This website</h3>
-    <ul>
-        <li><strong>Hosting</strong> — this site and its downloads are hosted by Vercel Inc. (USA).
-            Vercel processes connection data (IP address, time, requested file, browser)
-            to deliver the pages and protect them against abuse — legitimate interest,
-            Art. 6(1)(f) GDPR. Vercel is certified under the EU-US Data Privacy
-            Framework.</li>
-        <li><strong>No cookies, no tracking</strong> — no analytics, no ads, no external scripts or
-            fonts, and nothing stored in your browser.</li>
-        <li><strong>GitHub</strong> — links to the source code and issues lead to GitHub (GitHub
-            Inc., USA, also certified under the Data Privacy Framework), where GitHub's
-            own privacy policy applies.</li>
-    </ul>
-
-    <h3>Your rights</h3>
-    <p>You can ask for access to your data, correction, deletion, restriction, a copy,
-       and object to processing based on legitimate interest (Art. 15–21 GDPR) — on
-       Telegram, <a href="https://t.me/aquaxs">@aquaxs</a>. Since the extension's data never
-       reaches Sebi, that concerns the hosting data above. You can also complain to a
-       data protection authority; in Austria that is the Datenschutzbehörde
-       (<a href="https://www.dsb.gv.at">dsb.gv.at</a>).</p>
-
-    <h2>4. Acceptable use</h2>
-    <p>It is meant to track and limit your own browsing on your own machine. Do not
-       install it on someone else's device to monitor them without their knowledge —
-       that is what the extension makes easy and what these terms forbid.</p>
-
-    <h2>5. No warranty</h2>
-    <p>The extension is provided as is, without warranty of any kind. It can lose
-       measurements, miscount time or stop working after a browser update. Do not
-       rely on it for billing, payroll or anything else that must be exact.</p>
-
-    <h2>6. Liability</h2>
-    <p>To the extent permitted by law, the author is not liable for any damage or
-       loss arising from use of the extension — including lost data and time
-       blocked or not blocked by its limits.</p>
-
-    <h2>7. Blocking is not a lock</h2>
-    <p>Limits and focus mode are a nudge, not security. Anyone can snooze them or
-       disable the extension. Treat them as a reminder, not a guarantee.</p>
-
-    <h2>8. Third parties</h2>
-    <p>The extension talks to no server of ours; there is none. The downloads come
-       from this site, hosted by Vercel; the same ZIPs are attached to GitHub releases.
-       Browser sync, if you use it, is run by your browser's provider. Each works under
-       its own terms, and your browser vendor's rules apply to loading an unpacked
-       extension.</p>
-
-    <h2>9. Trademarks and affiliation</h2>
-    <p>An independent project, not affiliated with or endorsed by Google, Mozilla,
-       Microsoft or Brave. All trademarks remain with their owners.</p>
-
-    <h2>10. Changes</h2>
-    <p>These terms may change with future versions. The current version always
-       lives in the <a href="https://github.com/aquaxs1/Time-Tracker">repository</a>.</p>
-
-    <h2>11. Contact</h2>
-    <p>WebsiteTimeTrack is run by Sebi. Questions and bug reports go through
-       <a href="https://github.com/aquaxs1/Time-Tracker/issues">GitHub issues</a>, which are
-       public; anything about your data goes to
-       <a href="https://t.me/aquaxs">@aquaxs on Telegram</a>.</p>
-</main>
-
-<footer>
-    <div class="foot-inner">
-        <a class="brand" href="index.html">
-            <img src="assets/logo.png" alt="" width="24" height="24">
-            <span>WebsiteTimeTrack</span>
-        </a>
-        <nav class="foot-links">
-            <a href="index.html#features">Features</a>
-            <a href="terms.html#privacy">Privacy</a>
-            <a href="download.html">Download</a>
-            <a href="setup.html">Setup</a>
-            <a href="terms.html">Terms of Use</a>
-            <a href="https://github.com/aquaxs1/Time-Tracker">GitHub</a>
-        </nav>
-        <p class="copy">© 2026 aquaxs1</p>
+  <header class="nav" data-stuck="false" data-open="false">
+    <div class="nav-inner">
+      <a class="brand" href="./" aria-label="WebsiteTimeTrack home"><img src="assets/logo.png" alt="" width="32" height="32"><span>WebsiteTimeTrack</span></a>
+      <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="./#features">Features</a></li>
+        <li><a href="./#privacy">Privacy</a></li>
+        <li><a href="setup">Setup</a></li>
+        <li><a href="https://github.com/aquaxs1/Time-Tracker" rel="noopener">GitHub</a></li>
+        <li><a class="btn btn-primary btn-sm" href="download">Download</a></li>
+      </ul>
     </div>
-</footer>
+  </header>
 
+  <main id="main">
+<header class="page-head">
+      <div class="stage" data-scene="assets/scene.js" data-mode="mini" aria-hidden="true"><canvas></canvas></div>
+      <div class="page-head-inner">
+        <span class="eyebrow">Legal</span>
+        <h1>Terms of Use &amp; Privacy</h1>
+        <p class="lead">Last updated: 16 October 2026</p>
+      </div>
+    </header>
+
+    <section class="sec">
+      <div class="wrap">
+        <div class="sec-head reveal">
+          <h2>1. What these terms cover</h2>
+          <p class="lead">They cover the WebsiteTimeTrack browser extension and this website. Installing or using the extension means you accept them. If you do not, do not install it.</p>
+        </div>
+        <div class="prose reveal">
+          <h2>2. What this is</h2>
+          <p>WebsiteTimeTrack is a free, open-source browser extension. You install it yourself from source. There is no service behind it and no account.</p>
+          <h2 id="privacy">3. Privacy</h2>
+          <h3>Who is responsible</h3>
+          <p>WebsiteTimeTrack and this site are run by Sebi. For anything about your data, message <a href="https://t.me/aquaxs" rel="noopener">@aquaxs on Telegram</a>.</p>
+          <h3>The extension</h3>
+          <p>What it records stays in your own browser. The extension makes no network requests — no server, no account, no analytics, no telemetry — so none of it ever reaches Sebi.</p>
+          <ul>
+            <li><strong>Times</strong> — how long you spend on each website (by domain), per day, kept for 365 days.</li>
+            <li><strong>Sub-entries</strong> — with “Track sub-entities” (on by default), also the YouTube channel, GitHub or GitLab repository, subreddit, Twitch channel, X profile or Stack Overflow question, kept for 60 days. The YouTube channel name is read from the page; everything else comes from the address. Domains you add for section capture record the first part of the path.</li>
+            <li><strong>Activity</strong> — that you are using a page (mouse, keyboard, scroll), so an idle tab doesn't count. Not what you type.</li>
+            <li><strong>Settings and weekly reports</strong> — limits, categories, the ignore list, focus mode and your past reports.</li>
+            <li><strong>Never</strong> — other page content, form data, passwords, or anything on sites in your ignore list.</li>
+          </ul>
+          <h3>Browser sync</h3>
+          <p>Settings are kept in your browser's sync storage. If you are signed in to your browser's sync (with Google in Chrome, Mozilla in Firefox or Microsoft in Edge, for example), the browser copies them to your other devices through that provider, under its privacy policy; otherwise they stay on this device. “Sync usage data between devices” is off by default. Turned on, it does the same for your times of the last days you choose (14 by default, at most 30), per domain and in seconds. Turning it off removes this device's times from sync storage again.</p>
+          <h3>Your copy, your control</h3>
+          <ul>
+            <li>CSV exports and JSON backups are files you save yourself — they hold the same data, so look after them.</li>
+            <li>“Delete” next to a site or “Reset everything” in the popup removes recorded times.</li>
+          </ul>
+          <h3>This website</h3>
+          <ul>
+            <li><strong>Hosting</strong> — this site and its downloads are hosted by Vercel Inc. (USA). Vercel processes connection data (IP address, time, requested file, browser) to deliver the pages and protect them against abuse — legitimate interest, Art. 6(1)(f) GDPR. Vercel is certified under the EU-US Data Privacy Framework.</li>
+            <li><strong>No cookies, no tracking</strong> — no analytics, no ads, no external scripts or fonts, and nothing stored in your browser.</li>
+            <li><strong>GitHub</strong> — links to the source code and issues lead to GitHub (GitHub Inc., USA, also certified under the Data Privacy Framework), where GitHub's own privacy policy applies.</li>
+          </ul>
+          <h3>Your rights</h3>
+          <p>You can ask for access to your data, correction, deletion, restriction, a copy, and object to processing based on legitimate interest (Art. 15–21 GDPR) — on Telegram, <a href="https://t.me/aquaxs" rel="noopener">@aquaxs</a>. Since the extension's data never reaches Sebi, that concerns the hosting data above. You can also complain to a data protection authority; in Austria that is the Datenschutzbehörde (<a href="https://www.dsb.gv.at" rel="noopener">dsb.gv.at</a>).</p>
+          <h2>4. Acceptable use</h2>
+          <p>It is meant to track and limit your own browsing on your own machine. Do not install it on someone else's device to monitor them without their knowledge — that is what the extension makes easy and what these terms forbid.</p>
+          <h2>5. No warranty</h2>
+          <p>The extension is provided as is, without warranty of any kind. It can lose measurements, miscount time or stop working after a browser update. Do not rely on it for billing, payroll or anything else that must be exact.</p>
+          <h2>6. Liability</h2>
+          <p>To the extent permitted by law, the author is not liable for any damage or loss arising from use of the extension — including lost data and time blocked or not blocked by its limits.</p>
+          <h2>7. Blocking is not a lock</h2>
+          <p>Limits and focus mode are a nudge, not security. Anyone can snooze them or disable the extension. Treat them as a reminder, not a guarantee.</p>
+          <h2>8. Third parties</h2>
+          <p>The extension talks to no server of ours; there is none. The downloads come from this site, hosted by Vercel; the same ZIPs are attached to GitHub releases. Browser sync, if you use it, is run by your browser's provider. Each works under its own terms, and your browser vendor's rules apply to loading an unpacked extension.</p>
+          <h2>9. Trademarks and affiliation</h2>
+          <p>An independent project, not affiliated with or endorsed by Google, Mozilla, Microsoft or Brave. All trademarks remain with their owners.</p>
+          <h2>10. Changes</h2>
+          <p>These terms may change with future versions. The current version always lives in the <a href="https://github.com/aquaxs1/Time-Tracker" rel="noopener">repository</a>.</p>
+          <h2>11. Contact</h2>
+          <p>WebsiteTimeTrack is run by Sebi. Questions and bug reports go through <a href="https://github.com/aquaxs1/Time-Tracker/issues" rel="noopener">GitHub issues</a>, which are public; anything about your data goes to <a href="https://t.me/aquaxs" rel="noopener">@aquaxs on Telegram</a>.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-about">
+          <a class="brand" href="./"><img src="assets/logo.png" alt="" width="32" height="32" loading="lazy"><span>WebsiteTimeTrack</span></a>
+          <p>Measures how long you spend on every website — then helps you stop. All local.</p>
+        </div>
+        <nav class="footer-col" aria-label="Extension">
+          <h2>Extension</h2>
+          <ul>
+            <li><a href="./#features">Features</a></li>
+            <li><a href="./#privacy">Privacy</a></li>
+            <li><a href="download">Download</a></li>
+            <li><a href="setup">Setup</a></li>
+          </ul>
+        </nav>
+        <nav class="footer-col" aria-label="Project">
+          <h2>Project</h2>
+          <ul>
+            <li><a href="https://github.com/aquaxs1/Time-Tracker" rel="noopener">GitHub</a></li>
+            <li><a href="https://github.com/aquaxs1/Time-Tracker/issues" rel="noopener">Report a problem</a></li>
+          </ul>
+        </nav>
+        <nav class="footer-col" aria-label="Legal">
+          <h2>Legal</h2>
+          <ul>
+            <li><a href="terms">Terms of Use</a></li>
+            <li><a href="terms#privacy">Privacy notice</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="family">
+        <span class="family-label">More by AquAxs</span>
+        <ul>
+          <li><a href="https://aqua.is-a.dev/portfolio" data-home rel="noopener">All projects</a></li>
+          <li><a href="https://pfpair.app/" rel="noopener">Pfpair</a></li>
+          <li><a href="https://handled-market.vercel.app/" rel="noopener">Handled</a></li>
+          <li><a href="https://larpcorddc.vercel.app/" rel="noopener">Larpcord</a></li>
+          <li><a href="https://mybluejarvis.vercel.app/" rel="noopener">My Jarvis</a></li>
+          <li><a href="https://guardiantus-av.vercel.app/" rel="noopener">Guardiantus AV</a></li>
+          <li><a href="https://explorer-manager.vercel.app/" rel="noopener">Explorer Manager</a></li>
+          <li><a href="https://cipher-box-file-encrypter.vercel.app/" rel="noopener">CipherBox</a></li>
+          <li><a href="https://easy-cloner.vercel.app/" rel="noopener">Easy Server Cloner</a></li>
+          <li><a href="https://simple-skin.vercel.app/" rel="noopener">Simple Skin</a></li>
+          <li><a href="https://autobuild-gui.vercel.app/" rel="noopener">Autobuild GUI</a></li>
+          <li><a href="https://wave-uninstaller.vercel.app/" rel="noopener">Wave Uninstaller</a></li>
+          <li><a href="https://discord-sakurabot.vercel.app/" rel="noopener">Sakura Bot</a></li>
+          <li><a href="https://revox-client.vercel.app/" rel="noopener">Revox Client</a></li>
+          <li><a href="https://chesstrainer.cc.cd/" rel="noopener">Chess Trainer</a></li>
+        </ul>
+      </div>
+      <div class="footer-legal">
+        <p>© 2026 AquAxs. Released under the MIT License.</p>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

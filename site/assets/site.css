@@ -1,0 +1,29 @@
+/* WebsiteTimeTrack — the blue of the clock in the logo. Everything else is assets/aqx/aqx.css. */
+
+:root {
+  --ac: #4c9bff;
+  --ac-hi: #a9cfff;
+  --ac-ink: #020b1c;
+}
+
+/* The popup is a narrow window: its pictures are tall, not wide. */
+.coverflow.popups > * {
+  flex-basis: min(64vw, 19rem);
+}
+
+.hashes {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0;
+  list-style: none;
+}
+
+.hashes li {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.hashes code:last-child {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
