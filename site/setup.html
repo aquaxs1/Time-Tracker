@@ -1,89 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#07090d">
-<title>Setup — WebsiteTimeTrack</title>
-<meta property="og:type" content="website">
-<meta property="og:title" content="Setup — WebsiteTimeTrack">
-<meta property="og:description" content="Set up WebsiteTimeTrack: pin it, set a daily limit and switch on focus mode.">
-<meta name="description" content="Set up WebsiteTimeTrack: pin it, set a daily limit and switch on focus mode.">
-<link rel="icon" href="assets/favicon.png">
-<link rel="apple-touch-icon" href="assets/logo.png">
-<link rel="stylesheet" href="styles.css">
-<meta property="og:image" content="https://timetrackerextension.vercel.app/assets/og-image.png">
-<meta property="og:url" content="https://timetrackerextension.vercel.app/setup.html">
-<link rel="canonical" href="https://timetrackerextension.vercel.app/setup.html">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Setup — WebsiteTimeTrack</title>
+  <meta name="description" content="The first five minutes with WebsiteTimeTrack: pin it, browse, set a limit, use focus mode.">
+  <link rel="canonical" href="https://timetrackerextension.vercel.app/setup">
+  <meta name="theme-color" content="#050806">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="WebsiteTimeTrack">
+  <meta property="og:title" content="Setup — WebsiteTimeTrack">
+  <meta property="og:description" content="The first five minutes with WebsiteTimeTrack: pin it, browse, set a limit, use focus mode.">
+  <meta property="og:url" content="https://timetrackerextension.vercel.app/setup">
+  <meta property="og:image" content="https://timetrackerextension.vercel.app/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/favicon.png">
+  <link rel="preload" href="assets/aqx/fonts/bodoni-moda-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/aqx/fonts/inter-tight-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/aqx/aqx.css">
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/aqx/boot.js"></script>
+  <script type="module" src="assets/aqx/aqx.js"></script>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
+  <canvas class="aqx-sky" aria-hidden="true"></canvas>
+  <div class="aqx-aura" aria-hidden="true"></div>
+  <div class="aqx-progress" aria-hidden="true"></div>
 
-<header class="nav">
-    <a class="brand" href="index.html">
-        <img src="assets/logo.png" alt="" width="32" height="32">
-        <span>WebsiteTimeTrack</span>
-    </a>
-    <nav>
-        <a href="index.html#features">Features</a>
-        <a href="index.html#privacy">Privacy</a>
-        <a href="download.html">Download</a>
-        <a href="setup.html">Setup</a>
-        <a href="https://github.com/aquaxs1/Time-Tracker">GitHub</a>
-    </nav>
-</header>
-
-<main id="top">
-
-<section id="setup" class="section">
-    <h2>Setup</h2>
-    <h3 class="sub" id="first-run">First five minutes</h3>
-    <div class="grid steps">
-        <article><span class="step">1</span>
-            <h4>Pin it</h4>
-            <p>Click the puzzle icon in the toolbar and pin WebsiteTimeTrack so the
-               popup is one click away.</p></article>
-        <article><span class="step">2</span>
-            <h4>Just browse</h4>
-            <p>Tracking starts immediately. Come back in an hour and the ranking
-               will have filled itself in.</p></article>
-        <article><span class="step">3</span>
-            <h4>Set a limit</h4>
-            <p>Open <em>Settings</em>, add a daily limit for the site at the top of
-               your list, and tick <em>block</em> if you mean it.</p></article>
-        <article><span class="step">4</span>
-            <h4>Use focus mode</h4>
-            <p>The <em>Focus</em> button in the popup blocks social and entertainment
-               sites for an hour.</p></article>
+  <header class="nav" data-stuck="false" data-open="false">
+    <div class="nav-inner">
+      <a class="brand" href="./" aria-label="WebsiteTimeTrack home"><img src="assets/logo.png" alt="" width="32" height="32"><span>WebsiteTimeTrack</span></a>
+      <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="./#features">Features</a></li>
+        <li><a href="./#privacy">Privacy</a></li>
+        <li><a href="setup" aria-current="page">Setup</a></li>
+        <li><a href="https://github.com/aquaxs1/Time-Tracker" rel="noopener">GitHub</a></li>
+        <li><a class="btn btn-primary btn-sm" href="download">Download</a></li>
+      </ul>
     </div>
-</section>
+  </header>
 
-<section class="section">
-    <p class="req">Not installed yet? <a href="download.html">Get it here</a>.</p>
-</section>
+  <main id="main">
+<header class="page-head">
+      <div class="stage" data-scene="assets/scene.js" data-mode="mini" aria-hidden="true"><canvas></canvas></div>
+      <div class="page-head-inner">
+        <span class="eyebrow">Setup</span>
+        <h1>First <em>five minutes</em></h1>
+        <p class="lead">Tracking starts the moment the extension is loaded. These four steps get the rest out of it.</p>
+      </div>
+    </header>
 
-</main>
+    <section class="sec" id="setup">
+      <div class="wrap">
+        <ol class="steps" data-cols>
+          <li class="reveal">
+            <h3>Pin it</h3>
+            <p>Click the puzzle icon in the toolbar and pin WebsiteTimeTrack so the popup is one click away.</p>
+          </li>
+          <li class="reveal">
+            <h3>Just browse</h3>
+            <p>Tracking starts immediately. Come back in an hour and the ranking will have filled itself in.</p>
+          </li>
+          <li class="reveal">
+            <h3>Set a limit</h3>
+            <p>Open <strong>Settings</strong>, add a daily limit for the site at the top of your list, and tick <strong>block</strong> if you mean it.</p>
+          </li>
+          <li class="reveal">
+            <h3>Use focus mode</h3>
+            <p>The <strong>Focus</strong> button in the popup blocks social and entertainment sites for an hour.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
 
-<footer>
-    <div class="foot-inner">
-        <a class="brand" href="index.html">
-            <img src="assets/logo.png" alt="" width="24" height="24">
-            <span>WebsiteTimeTrack</span>
-        </a>
-        <nav class="foot-links">
-            <a href="index.html#features">Features</a>
-            <a href="terms.html#privacy">Privacy</a>
-            <a href="download.html">Download</a>
-            <a href="setup.html">Setup</a>
-            <a href="terms.html">Terms of Use</a>
-            <a href="https://github.com/aquaxs1/Time-Tracker">GitHub</a>
+    <section class="sec">
+      <div class="wrap">
+        <div class="note reveal">
+          <p>Not installed yet? <a class="textlink" href="download">Get it here</a>.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-about">
+          <a class="brand" href="./"><img src="assets/logo.png" alt="" width="32" height="32" loading="lazy"><span>WebsiteTimeTrack</span></a>
+          <p>Measures how long you spend on every website — then helps you stop. All local.</p>
+        </div>
+        <nav class="footer-col" aria-label="Extension">
+          <h2>Extension</h2>
+          <ul>
+            <li><a href="./#features">Features</a></li>
+            <li><a href="./#privacy">Privacy</a></li>
+            <li><a href="download">Download</a></li>
+            <li><a href="setup">Setup</a></li>
+          </ul>
         </nav>
-        <p class="copy">© 2026 aquaxs1</p>
+        <nav class="footer-col" aria-label="Project">
+          <h2>Project</h2>
+          <ul>
+            <li><a href="https://github.com/aquaxs1/Time-Tracker" rel="noopener">GitHub</a></li>
+            <li><a href="https://github.com/aquaxs1/Time-Tracker/issues" rel="noopener">Report a problem</a></li>
+          </ul>
+        </nav>
+        <nav class="footer-col" aria-label="Legal">
+          <h2>Legal</h2>
+          <ul>
+            <li><a href="terms">Terms of Use</a></li>
+            <li><a href="terms#privacy">Privacy notice</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="family">
+        <span class="family-label">More by AquAxs</span>
+        <ul>
+          <li><a href="https://aqua.is-a.dev/portfolio" data-home rel="noopener">All projects</a></li>
+          <li><a href="https://pfpair.app/" rel="noopener">Pfpair</a></li>
+          <li><a href="https://handled-market.vercel.app/" rel="noopener">Handled</a></li>
+          <li><a href="https://larpcorddc.vercel.app/" rel="noopener">Larpcord</a></li>
+          <li><a href="https://mybluejarvis.vercel.app/" rel="noopener">My Jarvis</a></li>
+          <li><a href="https://guardiantus-av.vercel.app/" rel="noopener">Guardiantus AV</a></li>
+          <li><a href="https://explorer-manager.vercel.app/" rel="noopener">Explorer Manager</a></li>
+          <li><a href="https://cipher-box-file-encrypter.vercel.app/" rel="noopener">CipherBox</a></li>
+          <li><a href="https://easy-cloner.vercel.app/" rel="noopener">Easy Server Cloner</a></li>
+          <li><a href="https://simple-skin.vercel.app/" rel="noopener">Simple Skin</a></li>
+          <li><a href="https://autobuild-gui.vercel.app/" rel="noopener">Autobuild GUI</a></li>
+          <li><a href="https://wave-uninstaller.vercel.app/" rel="noopener">Wave Uninstaller</a></li>
+          <li><a href="https://discord-sakurabot.vercel.app/" rel="noopener">Sakura Bot</a></li>
+          <li><a href="https://revox-client.vercel.app/" rel="noopener">Revox Client</a></li>
+          <li><a href="https://chesstrainer.cc.cd/" rel="noopener">Chess Trainer</a></li>
+        </ul>
+      </div>
+      <div class="footer-legal">
+        <p>© 2026 AquAxs. Released under the MIT License.</p>
+      </div>
     </div>
-</footer>
-
+  </footer>
 </body>
 </html>

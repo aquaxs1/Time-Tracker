@@ -11,7 +11,7 @@ helps you stop. Daily limits, focus mode, categories and a weekly report.
 Everything stays on your machine.
 
 [![Website](https://img.shields.io/badge/website-timetrackerextension.vercel.app-2f8fff)](https://timetrackerextension.vercel.app)
-[![Download](https://img.shields.io/badge/download-Chrome%20%7C%20Firefox-27ae60)](https://timetrackerextension.vercel.app/download.html)
+[![Download](https://img.shields.io/badge/download-Chrome%20%7C%20Firefox-27ae60)](https://timetrackerextension.vercel.app/download)
 [![Manifest](https://img.shields.io/badge/manifest-V3-5f6caf)](WebsiteTimeTrack/manifest.json)
 [![Tests](https://img.shields.io/badge/tests-65%20passing-3fa96b)](WebsiteTimeTrack/test)
 [![Dependencies](https://img.shields.io/badge/runtime%20deps-none-lightgrey)](package.json)
@@ -137,7 +137,7 @@ looking at (and, on YouTube, the channel name) and writes times into your own
 browser storage. The only thing that can leave your machine is what your
 browser's own sync carries, if you use it: your settings, and the last few days
 of times if you turn on device sync. Full notice:
-[timetrackerextension.vercel.app/terms.html#privacy](https://timetrackerextension.vercel.app/terms.html#privacy).
+[timetrackerextension.vercel.app/terms#privacy](https://timetrackerextension.vercel.app/terms#privacy).
 
 ---
 
@@ -233,5 +233,5 @@ keep the file outside the repository.
 ## Links
 
 - **Website** — <https://timetrackerextension.vercel.app>
-- **Terms of Use** — <https://timetrackerextension.vercel.app/terms.html>
-- **Downloads** — <https://timetrackerextension.vercel.app/download.html>
+- **Terms of Use** — <https://timetrackerextension.vercel.app/terms>
+- **Downloads** — <https://timetrackerextension.vercel.app/download>
