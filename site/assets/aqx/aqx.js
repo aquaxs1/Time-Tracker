@@ -13,6 +13,7 @@
  *   count      numbers count up when they come into view
  *   copy       a copy button on every code block
  *   showcase   panels straighten as they scroll in
+ *   tabs       a row of tabs with one panel on show
  *   coverflow  a row of pictures that turn in space as you swipe
  *   stage      loads the page's 3D scene (stage.js + three.js) when it is needed
  */
@@ -380,6 +381,50 @@ function showcase() {
   update();
 }
 
+/* ------------------------------------------------------------------- tabs */
+
+function tabs() {
+  for (const box of document.querySelectorAll('.tabs')) {
+    const buttons = [...box.querySelectorAll(':scope > .tabs-list [role="tab"]')];
+    const panels = [...box.querySelectorAll(':scope > .tabs-panel')];
+    if (buttons.length < 2 || buttons.length !== panels.length) continue;
+    const counter = box.querySelector('.tabs-count');
+    const two = (n) => String(n).padStart(2, '0');
+    let index = 0;
+
+    const show = (next, focus) => {
+      index = (next + buttons.length) % buttons.length;
+      buttons.forEach((button, i) => {
+        button.setAttribute('aria-selected', String(i === index));
+        button.tabIndex = i === index ? 0 : -1;
+      });
+      panels.forEach((panel, i) => {
+        panel.hidden = i !== index;
+      });
+      if (counter) counter.textContent = `${two(index + 1)} / ${two(buttons.length)}`;
+      if (focus) buttons[index].focus({ preventScroll: true });
+      // Keep the chosen tab in sight when the row scrolls sideways, without moving the page.
+      const list = buttons[index].parentElement;
+      const left = buttons[index].offsetLeft - list.offsetLeft;
+      if (left < list.scrollLeft || left + buttons[index].offsetWidth > list.scrollLeft + list.clientWidth) {
+        list.scrollTo({ left: left - 16, behavior: reduced ? 'auto' : 'smooth' });
+      }
+    };
+
+    buttons.forEach((button, i) => button.addEventListener('click', () => show(i)));
+    box.querySelector('.tabs-list').addEventListener('keydown', (event) => {
+      const move = { ArrowRight: index + 1, ArrowLeft: index - 1, Home: 0, End: buttons.length - 1 }[event.key];
+      if (move === undefined) return;
+      event.preventDefault();
+      show(move, true);
+    });
+    for (const step of box.querySelectorAll('[data-tabs-step]')) {
+      step.addEventListener('click', () => show(index + Number(step.dataset.tabsStep)));
+    }
+    show(0);
+  }
+}
+
 /* -------------------------------------------------------------- coverflow */
 
 function coverflow() {
@@ -417,6 +462,16 @@ function coverflow() {
       row.scrollLeft = second.offsetLeft - (row.clientWidth - second.clientWidth) / 2;
     }
     update();
+
+    // A picture at the side comes to the front when it is clicked.
+    row.addEventListener('click', (event) => {
+      const item = [...row.children].find((child) => child.contains(event.target));
+      if (!item) return;
+      const box = row.getBoundingClientRect();
+      const rect = item.getBoundingClientRect();
+      const offset = rect.left + rect.width / 2 - (box.left + box.width / 2);
+      if (Math.abs(offset) > rect.width * 0.25) row.scrollBy({ left: offset, behavior: 'smooth' });
+    });
 
     const nav = row.parentElement.querySelector('.coverflow-nav');
     if (nav) {
@@ -473,7 +528,7 @@ function stages() {
 
 /* ------------------------------------------------------------------- boot */
 
-for (const part of [sky, nav, reveal, tilt, magnet, typed, count, copy, showcase, coverflow, stages]) {
+for (const part of [sky, nav, reveal, tilt, magnet, typed, count, copy, showcase, tabs, coverflow, stages]) {
   try {
     part();
   } catch (error) {

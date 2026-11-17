@@ -443,7 +443,8 @@ export function createStage(holder, options = {}) {
     raf = requestAnimationFrame(tick);
     const ms = now - last;
     last = now;
-    const delta = Math.min(0.05, ms / 1000);
+    // The first frame's timestamp can lie before the moment play() was called.
+    const delta = Math.max(0, Math.min(0.05, ms / 1000));
 
     // A device that cannot keep up gets fewer pixels rather than a slideshow.
     frames += 1;

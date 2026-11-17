@@ -385,6 +385,11 @@ kbd {
   margin-top: 1.6rem;
 }
 
+/* Blocks that follow one another inside a section keep their distance. */
+.wrap > :is(.cards, .steps, .table-wrap, .note, .flow, .faq, .prose, .split, .stats, .panel, .cta, .tabs, pre) + :is(.cards, .steps, .table-wrap, .note, .flow, .faq, .prose, .split, .stats, .panel, .cta, .tabs, pre) {
+  margin-top: 1.25rem;
+}
+
 /* ---------------------------------------------------------------- Buttons */
 
 .btn {
@@ -1018,7 +1023,12 @@ kbd {
 }
 
 .cards[data-cols='4'] {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.5rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15.5rem), 1fr));
+}
+
+/* A label at the top of a card is as wide as its text, not as the card. */
+.card > :is(.pill, .yes, .no, .maybe) {
+  justify-self: start;
 }
 
 /* Two cards side by side: what you have without it, what you get with it. */
@@ -1080,6 +1090,15 @@ kbd {
   will-change: transform;
 }
 
+/* Whole screens rather than popups get more room. */
+.coverflow.wide {
+  padding-inline: max(var(--shell-pad), calc(50% - 27rem));
+}
+
+.coverflow.wide > * {
+  flex-basis: min(86vw, 54rem);
+}
+
 .shot {
   display: grid;
   gap: 0.75rem;
@@ -1114,6 +1133,16 @@ kbd {
   text-transform: uppercase;
 }
 
+/* A line of small print under a picture or a block. */
+.fineprint {
+  margin-top: 1.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--faint);
+  text-align: center;
+}
+
 /* A card that carries a number instead of an icon. */
 .stat {
   display: grid;
@@ -1144,6 +1173,254 @@ kbd {
   border-block: 1px solid var(--line-soft);
 }
 
+/* A short list where every point carries its own icon. */
+.points {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0;
+  list-style: none;
+}
+
+.points > li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.85rem;
+  color: var(--muted);
+}
+
+.points > li > svg {
+  box-sizing: content-box;
+  width: 1.05rem;
+  height: 1.05rem;
+  padding: 0.5rem;
+  border-radius: 11px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--ac) 12%, transparent);
+  color: var(--ac-hi);
+}
+
+/* A chain: one thing hands over to the next. */
+.flow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 2.4rem;
+  padding: 0;
+  list-style: none;
+}
+
+/* Each link of the chain is a wrapper, so the arrow is its own and not the card's. */
+.flow > * {
+  position: relative;
+  display: grid;
+}
+
+.flow > * + *::before {
+  content: '';
+  position: absolute;
+  left: -1.75rem;
+  top: 50%;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-top: 2px solid var(--ac);
+  border-right: 2px solid var(--ac);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+@media (max-width: 760px) {
+  .flow > * + *::before {
+    left: 50%;
+    top: -1.75rem;
+    transform: translateX(-50%) rotate(135deg);
+  }
+}
+
+/* ------------------------------------------------------------------- Tabs */
+/*
+ * Something you click through: a row of tabs, one panel on show. Without
+ * script every panel is simply there, one under the other.
+ */
+.tabs {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.tabs-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tabs-list [role='tab'] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.75rem;
+  padding: 0.3rem 1.05rem 0.3rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.tabs-list [role='tab'] b {
+  display: grid;
+  place-items: center;
+  width: 1.95rem;
+  height: 1.95rem;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.tabs-list [role='tab'] b svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.tabs-list [role='tab']:hover {
+  color: var(--fg);
+}
+
+.tabs-list [role='tab'][aria-selected='true'] {
+  color: var(--fg);
+  border-color: color-mix(in srgb, var(--ac) 60%, transparent);
+  background: color-mix(in srgb, var(--ac) 14%, transparent);
+}
+
+.tabs-list [role='tab'][aria-selected='true'] b {
+  border-color: var(--ac);
+  background: var(--ac);
+  color: var(--ac-ink);
+}
+
+.tabs-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: clamp(1.25rem, 3vw, 3rem);
+  align-items: center;
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  border-radius: calc(var(--radius) + 4px);
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02) 60%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 40px 90px -60px color-mix(in srgb, var(--ac) 65%, transparent);
+  min-width: 0;
+}
+
+.tabs-panel > * {
+  min-width: 0;
+}
+
+/* One column, for panels whose content is one long line or one block. */
+.tabs-panel[data-cols='1'] {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.tabs-panel[hidden] {
+  display: none;
+}
+
+.js .tabs-panel:not([hidden]) {
+  animation: tabs-in 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes tabs-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem);
+  }
+}
+
+.tabs-panel p {
+  color: var(--muted);
+}
+
+.tabs-figure {
+  margin: 0;
+  min-width: 0;
+}
+
+.tabs-figure svg,
+.tabs-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 22rem;
+}
+
+.tabs-foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--faint);
+}
+
+.tabs-foot button {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--fg);
+  cursor: pointer;
+  transition: border-color 180ms ease;
+}
+
+.tabs-foot button:hover {
+  border-color: color-mix(in srgb, var(--ac) 60%, transparent);
+}
+
+.tabs-foot svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+/* On a phone the tabs stay one row you can swipe along. */
+@media (max-width: 620px) {
+  .tabs-list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: calc(-1 * var(--shell-pad));
+    padding: 0.2rem var(--shell-pad);
+    scroll-padding-inline: var(--shell-pad);
+    scrollbar-width: none;
+  }
+
+  .tabs-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tabs-list [role='tab'] {
+    flex: none;
+  }
+}
+
+/* Without script there is nothing to step through. */
+html:not(.js) .tabs-list,
+html:not(.js) .tabs-foot {
+  display: none;
+}
+
 /* ------------------------------------------------------------------ Steps */
 
 .steps {
@@ -1166,6 +1443,7 @@ kbd {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
   min-width: 0;
+  align-content: start;
 }
 
 .steps > li::before,
@@ -1196,6 +1474,20 @@ kbd {
 .steps[data-cols] > li,
 .steps[data-cols] > .step {
   padding: 4rem 1.4rem 1.4rem;
+}
+
+/* On a phone the number sits above the text, so the text keeps the full width. */
+@media (max-width: 620px) {
+  .steps > li,
+  .steps > .step {
+    padding: 3.7rem 1.15rem 1.25rem;
+  }
+
+  .steps > li::before,
+  .steps > .step::before {
+    left: 1.15rem;
+    top: 1.05rem;
+  }
 }
 
 /* ----------------------------------------------------------------- Tables */
@@ -1310,6 +1602,20 @@ pre {
   line-height: 1.7;
   color: #dfe7e1;
   tab-size: 2;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* What the block is: a terminal, a file, a command typed into an app. */
+pre[data-label]::before {
+  content: attr(data-label);
+  display: block;
+  margin-bottom: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
 }
 
 pre code {
